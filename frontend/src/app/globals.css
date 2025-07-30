@@ -56,6 +56,14 @@ a {
   outline-offset: 2px;
 }
 
+/* Remove border on focus for main buttons and icon button */
+.btn-primary:focus,
+.btn-secondary:focus,
+button[aria-label]:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.3);
+}
+
 /* Smooth transitions */
 * {
   transition: all 0.2s ease-in-out;
@@ -64,11 +72,11 @@ a {
 @layer components {
   /* Custom button styles */
   .btn-primary {
-    @apply bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+    @apply bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-0;
   }
 
   .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-0;
   }
 
   /* Custom input styles */
