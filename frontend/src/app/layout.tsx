@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "../components/Navigation";
 import PageTransition from "../components/PageTransition";
+import AuthProvider from "../components/AuthProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,11 +26,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
-      <body className={`${inter.variable} font-sans antialiased bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 min-h-screen transition-colors duration-500`}>
-        <PageTransition>
-          <Navigation />
-          {children}
-        </PageTransition>
+      <body className={`${inter.variable} font-sans antialiased bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 min-h-screen transition-colors duration-500 pt-16`}>
+        <AuthProvider>
+          <PageTransition>
+            <Navigation />
+            {children}
+          </PageTransition>
+        </AuthProvider>
       </body>
     </html>
   );

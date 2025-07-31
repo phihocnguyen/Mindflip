@@ -12,7 +12,7 @@ export default function AuthCallbackPage() {
     const token = searchParams.get("token");
     if (token) {
       login(token);
-      router.replace("/");
+      router.replace("/dashboard");
     } else {
       // Nếu không có token, chuyển về trang đăng nhập
       router.replace("/login");
