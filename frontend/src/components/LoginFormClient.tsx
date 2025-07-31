@@ -76,13 +76,16 @@ export default function LoginFormClient() {
         }),
       });
       const data: LoginResponse = await response.json();
+      console.log('Login response:', data);
       if (response.ok) {
         if (data.token) {
+          console.log('Setting token and user in store');
           login(data.token, data.user); // <-- dùng Zustand store
         }
         setSuccess('Đăng nhập thành công! Đang chuyển hướng...');
         setTimeout(() => {
-          router.push('/');
+          console.log('Redirecting to dashboard');
+          router.push('/dashboard');
         }, 1500);
       } else {
         setError(data.message || 'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.');
