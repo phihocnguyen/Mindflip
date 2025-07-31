@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Mindflip - Đăng ký và Đăng nhập",
-  description: "Hệ thống đăng ký và đăng nhập với Next.js",
+  title: "Mindflip - Nền tảng học từ vựng thông minh",
+  description: "Mindflip - Nền tảng học từ vựng thông minh",
   icons: {
     icon: '/favicon.svg',
   },
