@@ -21,7 +21,7 @@ export class EmailService {
         html: `
           <h1>Chào ${username},</h1>
           <p>Cảm ơn bạn đã đăng ký. Vui lòng nhấn vào link bên dưới để kích hoạt tài khoản:</p>
-          <a href="${verificationLink}">Kích hoạt tài khoản</a>
+          <a href="http://localhost:3000/?token${verificationLink}">Kích hoạt tài khoản</a>
           <p>Link sẽ hết hạn sau 1 giờ.</p>
         `,
       });

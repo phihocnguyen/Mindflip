@@ -1,14 +1,34 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthStore } from '../hooks/authStore';
 import { useEffect, useState } from 'react';
 
 export default function Navigation() {
-  const { isAuthenticated, logout, user } = useAuth();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const logout = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.user);
+  const initialize = useAuthStore((state) => state.initialize);
+  
+  // Luôn khởi tạo false để tránh hydration mismatch
   const [darkMode, setDarkMode] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Khôi phục auth state từ localStorage
+    initialize();
+    
+    // Khôi phục theme từ localStorage sau khi mount
+    const saved = localStorage.getItem('theme');
+    const shouldBeDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    setDarkMode(shouldBeDark);
+    setMounted(true);
+  }, [initialize]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    
+    // Áp dụng theme vào DOM
     if (darkMode) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -16,15 +36,7 @@ export default function Navigation() {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
-  }, [darkMode]);
-
-  useEffect(() => {
-    // Khởi tạo theme theo localStorage hoặc hệ điều hành
-    const saved = localStorage.getItem('theme');
-    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      setDarkMode(true);
-    }
-  }, []);
+  }, [darkMode, mounted]);
 
   const handleLogout = () => {
     logout();
@@ -64,13 +76,21 @@ export default function Navigation() {
             {isAuthenticated ? (
               <>
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      {user?.email?.charAt(0).toUpperCase() || 'U'}
-                    </span>
+                  <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center overflow-hidden">
+                    {user?.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.name || user.email}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-white text-sm font-medium">
+                        {user?.email?.charAt(0).toUpperCase() || 'U'}
+                      </span>
+                    )}
                   </div>
                   <span className="text-gray-700 dark:text-gray-200 font-medium hidden sm:block">
-                    Xin chào, {user?.email || 'User'}
+                    Xin chào, {user?.name || 'User'}
                   </span>
                 </div>
                 <button

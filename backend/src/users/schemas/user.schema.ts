@@ -9,11 +9,14 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  @Prop({ type: String, required: false, default: null })
   name: string;
 
-  @Prop({ required: true })
-  password: string;
+  @Prop({ type: String, required: false, default: null })
+  password?: string;
+
+  @Prop({ default: null })
+  avatar?: string;
 
   @Prop({ default: null })
   googleId?: string;
@@ -32,6 +35,8 @@ UserSchema.pre<UserDocument>('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
   }
-  this.password = await bcrypt.hash(this.password, 10);
+  if (this.password) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
   next();
 });

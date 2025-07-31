@@ -3,6 +3,8 @@ import { create } from 'zustand';
 interface User {
   id: string;
   email: string;
+  name: string;
+  avatar?: string;
 }
 
 interface AuthState {
@@ -40,17 +42,35 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
   updateUser: (user) => set((state) => ({ ...state, user })),
-  initialize: () => {
+  initialize: async () => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
     if (token) {
-      set({
-        token,
-        isAuthenticated: true,
-        isLoading: false,
-        user: null, // Có thể decode token để lấy user info
-      });
+      try {
+        // Decode JWT token để lấy user info
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const user = {
+          id: payload.sub,
+          email: payload.email,
+          avatar: payload.avatar,
+          name: payload.name // JWT payload vẫn là username nhưng map sang name
+        };
+        set({
+          token,
+          isAuthenticated: true,
+          isLoading: false,
+          user,
+        });
+      } catch (error) {
+        // Nếu decode thất bại, vẫn set authenticated nhưng user = null
+        set({
+          token,
+          isAuthenticated: true,
+          isLoading: false,
+          user: null,
+        });
+      }
     } else {
       set((state) => ({ ...state, isLoading: false }));
     }
   },
-})); 
+}));

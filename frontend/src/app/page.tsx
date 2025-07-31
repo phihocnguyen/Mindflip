@@ -1,10 +1,12 @@
 'use client';
 
-import { useAuth } from '../hooks/useAuth';
+import { useAuthStore } from '../hooks/authStore';
 import Link from 'next/link';
 
 export default function Home() {
-  const { isAuthenticated, user } = useAuth();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+  console.log(user)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-950 dark:to-gray-800 transition-colors duration-500">
@@ -17,8 +19,7 @@ export default function Home() {
             </span>
           </h1>
           <p className="text-body max-w-3xl mx-auto mb-12 text-lg text-gray-700 dark:text-gray-200">
-            Hệ thống đăng ký và đăng nhập an toàn được xây dựng với Next.js và NestJS. 
-            Trải nghiệm giao diện hiện đại và bảo mật cao.
+            Mindflip là nền tảng học từ vựng thông minh, tích hợp phương pháp flashcard tương tác cùng tính năng tra từ tức thời, tối ưu hóa khả năng ghi nhớ và tốc độ học ngoại ngữ.
           </p>
           
           {isAuthenticated ? (
@@ -73,60 +74,64 @@ export default function Home() {
         <div className="mt-24">
           <h2 className="heading-2 text-center mb-12 text-gray-900 dark:text-white">Tính năng nổi bật</h2>
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Tính năng: Học từ vựng bằng flashcard */}
             <div className="card bg-white dark:bg-gray-900 dark:border-gray-800 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" />
                     </svg>
                   </div>
                 </div>
                 <div className="ml-4">
-                  <h3 className="heading-3 mb-2 text-gray-900 dark:text-white">Bảo mật cao</h3>
+                  <h3 className="heading-3 mb-2 text-gray-900 dark:text-white">Flashcard thông minh</h3>
                   <p className="text-body text-gray-700 dark:text-gray-200">
-                    Hệ thống bảo mật với JWT và mã hóa mật khẩu, đảm bảo thông tin người dùng được bảo vệ tối đa.
+                    Học từ vựng hiệu quả với flashcard tương tác, hỗ trợ ví dụ, phát âm và hình ảnh minh hoạ.
                   </p>
                 </div>
               </div>
             </div>
 
+            {/* Tính năng: Tra từ ngay trong lúc học */}
             <div className="card bg-white dark:bg-gray-900 dark:border-gray-800 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                   </div>
                 </div>
                 <div className="ml-4">
-                  <h3 className="heading-3 mb-2 text-gray-900 dark:text-white">Hiệu suất cao</h3>
+                  <h3 className="heading-3 mb-2 text-gray-900 dark:text-white">Tra từ tức thì</h3>
                   <p className="text-body text-gray-700 dark:text-gray-200">
-                    Được xây dựng với Next.js và NestJS hiện đại, mang lại trải nghiệm nhanh chóng và mượt mà.
+                    Chạm để tra nghĩa ngay trong khi học, không cần rời bài – liền mạch, nhanh và tiện lợi.
                   </p>
                 </div>
               </div>
             </div>
 
+            {/* Tính năng: Lặp lại thông minh */}
             <div className="card bg-white dark:bg-gray-900 dark:border-gray-800 transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v6h6M20 20v-6h-6" />
                     </svg>
                   </div>
                 </div>
                 <div className="ml-4">
-                  <h3 className="heading-3 mb-2 text-gray-900 dark:text-white">Dễ sử dụng</h3>
+                  <h3 className="heading-3 mb-2 text-gray-900 dark:text-white">Lặp lại ngắt quãng</h3>
                   <p className="text-body text-gray-700 dark:text-gray-200">
-                    Giao diện thân thiện và trải nghiệm người dùng tốt, phù hợp với mọi thiết bị.
+                    Tự động đề xuất ôn tập theo thời điểm dễ quên nhất để ghi nhớ lâu hơn – ứng dụng SRS hiệu quả.
                   </p>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
