@@ -1,32 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { apiHelper } from '~/libs/api';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Gửi request đến backend
-    const response = await fetch('http://localhost:3000/api/auth/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      return NextResponse.json(data, { status: 200 });
+    const response = await apiHelper.post('/auth/register', body);
+    
+    if (response.success) {
+      return NextResponse.json(response.data, { status: 201 });
     } else {
-      return NextResponse.json(data, { status: response.status });
+      return NextResponse.json(
+        { error: response.error },
+        { status: 400 }
+      );
     }
   } catch (error) {
     console.error('Error in register API route:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        message: 'Lỗi server. Vui lòng thử lại sau.' 
-      }, 
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

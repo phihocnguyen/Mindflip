@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiHelper } from '~/libs/api';
 
-export async function POST(request: NextRequest) {
+// GET /api/dashboard - Lấy dữ liệu dashboard
+export async function GET(request: NextRequest) {
   try {
-    const body = await request.json();
-    
-    const response = await apiHelper.post('/auth/login', body);
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    const response = await apiHelper.get(`/dashboard?userId=${userId}`);
     
     if (response.success) {
-      return NextResponse.json(response.data, { status: 200 });
+      return NextResponse.json(response.data);
     } else {
       return NextResponse.json(
         { error: response.error },
@@ -16,7 +18,6 @@ export async function POST(request: NextRequest) {
       );
     }
   } catch (error) {
-    console.error('Error in login API route:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
