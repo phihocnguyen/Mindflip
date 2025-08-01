@@ -2,20 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiHelper } from '~/libs/api';
 
 // GET /api/sets/[id] - Lấy thông tin set cụ thể
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const id = pathname.split('/').pop(); // Lấy ID từ đường dẫn URL
+
+  const token = request.headers.get('authorization') ?? '';
+  const headerObject = token ? { Authorization: token } : undefined;
+
   try {
-    const response = await apiHelper.get(`/sets/${params.id}`);
-    
+    console.log(id, headerObject);
+    const response = await apiHelper.get(`/api/sets/${id}`, {
+      headers: headerObject,
+    });
+
     if (response.success) {
       return NextResponse.json(response.data);
     } else {
-      return NextResponse.json(
-        { error: response.error },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: response.error }, { status: 404 });
     }
   } catch (error) {
     return NextResponse.json(
@@ -25,23 +28,26 @@ export async function GET(
   }
 }
 
+
 // PUT /api/sets/[id] - Cập nhật set
-export async function PUT(
+export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const token = request.headers.get('authorization') ?? '';
+    const headers = token ? { Authorization: token } : undefined;
+
     const body = await request.json();
-    
-    const response = await apiHelper.put(`/sets/${params.id}`, body);
-    
+
+    const response = await apiHelper.patch(`/sets/${params.id}`, body, {
+      headers: headers,
+    });
+
     if (response.success) {
       return NextResponse.json(response.data);
     } else {
-      return NextResponse.json(
-        { error: response.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: response.error }, { status: 400 });
     }
   } catch (error) {
     return NextResponse.json(
@@ -57,15 +63,17 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const response = await apiHelper.delete(`/sets/${params.id}`);
-    
+    const token = request.headers.get('authorization') ?? '';
+    const headers = token ? { Authorization: token } : undefined;
+
+    const response = await apiHelper.delete(`/sets/${params.id}`, {
+      headers: headers,
+    });
+
     if (response.success) {
       return NextResponse.json({ message: 'Set deleted successfully' });
     } else {
-      return NextResponse.json(
-        { error: response.error },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: response.error }, { status: 400 });
     }
   } catch (error) {
     return NextResponse.json(
@@ -73,4 +81,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}

@@ -33,11 +33,23 @@ export const apiHelper = {
   // GET request
   get: async <T>(url: string, config?: any): Promise<ApiResponse<T>> => {
     try {
+      console.log("get", url, config);
       const response = await axiosInstance.get(url, config);
-      return {
-        success: true,
-        data: response.data
-      };
+      // API trả về format: {"statusCode":200,"message":"Success","data":[]}
+      const apiResponse = response.data;
+      
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        return {
+          success: true,
+          data: apiResponse.data,
+          message: apiResponse.message
+        };
+      } else {
+        return {
+          success: false,
+          error: apiResponse.message || 'Request failed'
+        };
+      }
     } catch (error: any) {
       return {
         success: false,
@@ -49,11 +61,22 @@ export const apiHelper = {
   // POST request
   post: async <T>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> => {
     try {
+      console.log("post", url, data, config);
       const response = await axiosInstance.post(url, data, config);
-      return {
-        success: true,
-        data: response.data
-      };
+      // API trả về format: {"statusCode":200,"message":"Success","data":[]}
+      const apiResponse = response.data;
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        return {
+          success: true,
+          data: apiResponse.data,
+          message: apiResponse.message 
+        };
+      } else {
+        return {
+          success: false,
+          error: apiResponse.message || 'Request failed'
+        };
+      }
     } catch (error: any) {
       return {
         success: false,
@@ -66,10 +89,21 @@ export const apiHelper = {
   put: async <T>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> => {
     try {
       const response = await axiosInstance.put(url, data, config);
-      return {
-        success: true,
-        data: response.data
-      };
+      // API trả về format: {"statusCode":200,"message":"Success","data":[]}
+      const apiResponse = response.data;
+      
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        return {
+          success: true,
+          data: apiResponse.data,
+          message: apiResponse.message
+        };
+      } else {
+        return {
+          success: false,
+          error: apiResponse.message || 'Request failed'
+        };
+      }
     } catch (error: any) {
       return {
         success: false,
@@ -82,10 +116,21 @@ export const apiHelper = {
   patch: async <T>(url: string, data?: any, config?: any): Promise<ApiResponse<T>> => {
     try {
       const response = await axiosInstance.patch(url, data, config);
-      return {
-        success: true,
-        data: response.data
-      };
+      // API trả về format: {"statusCode":200,"message":"Success","data":[]}
+      const apiResponse = response.data;
+      
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        return {
+          success: true,
+          data: apiResponse.data,
+          message: apiResponse.message
+        };
+      } else {
+        return {
+          success: false,
+          error: apiResponse.message || 'Request failed'
+        };
+      }
     } catch (error: any) {
       return {
         success: false,
@@ -98,10 +143,21 @@ export const apiHelper = {
   delete: async <T>(url: string, config?: any): Promise<ApiResponse<T>> => {
     try {
       const response = await axiosInstance.delete(url, config);
-      return {
-        success: true,
-        data: response.data
-      };
+      // API trả về format: {"statusCode":200,"message":"Success","data":[]}
+      const apiResponse = response.data;
+      
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        return {
+          success: true,
+          data: apiResponse.data,
+          message: apiResponse.message
+        };
+      } else {
+        return {
+          success: false,
+          error: apiResponse.message || 'Request failed'
+        };
+      }
     } catch (error: any) {
       return {
         success: false,
@@ -120,10 +176,21 @@ export const apiHelper = {
           ...config?.headers
         }
       });
-      return {
-        success: true,
-        data: response.data
-      };
+      // API trả về format: {"statusCode":200,"message":"Success","data":[]}
+      const apiResponse = response.data;
+      
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        return {
+          success: true,
+          data: apiResponse.data,
+          message: apiResponse.message
+        };
+      } else {
+        return {
+          success: false,
+          error: apiResponse.message || 'Upload failed'
+        };
+      }
     } catch (error: any) {
       return {
         success: false,
@@ -169,15 +236,25 @@ export const authAPI = {
   login: async (credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> => {
     try {
       const response = await axiosInstance.post('/auth/login', credentials);
-      const { token, user } = response.data;
+      const apiResponse = response.data;
       
-      // Lưu token vào localStorage
-      setAuthToken(token);
-      
-      return {
-        success: true,
-        data: { token, user }
-      };
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        const { token, user } = apiResponse.data;
+        
+        // Lưu token vào localStorage
+        setAuthToken(token);
+        
+        return {
+          success: true,
+          data: { token, user },
+          message: apiResponse.message
+        };
+      } else {
+        return {
+          success: false,
+          error: apiResponse.message || 'Login failed'
+        };
+      }
     } catch (error: any) {
       return {
         success: false,
@@ -190,15 +267,25 @@ export const authAPI = {
   register: async (userData: { email: string; password: string; name: string }): Promise<ApiResponse<LoginResponse>> => {
     try {
       const response = await axiosInstance.post('/auth/register', userData);
-      const { token, user } = response.data;
+      const apiResponse = response.data;
       
-      // Lưu token vào localStorage
-      setAuthToken(token);
-      
-      return {
-        success: true,
-        data: { token, user }
-      };
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        const { token, user } = apiResponse.data;
+        
+        // Lưu token vào localStorage
+        setAuthToken(token);
+        
+        return {
+          success: true,
+          data: { token, user },
+          message: apiResponse.message
+        };
+      } else {
+        return {
+          success: false,
+          error: apiResponse.message || 'Registration failed'
+        };
+      }
     } catch (error: any) {
       return {
         success: false,
@@ -224,10 +311,20 @@ export const authAPI = {
   getCurrentUser: async (): Promise<ApiResponse<User>> => {
     try {
       const response = await axiosInstance.get('/auth/me');
-      return {
-        success: true,
-        data: response.data
-      };
+      const apiResponse = response.data;
+      
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        return {
+          success: true,
+          data: apiResponse.data,
+          message: apiResponse.message
+        };
+      } else {
+        return {
+          success: false,
+          error: apiResponse.message || 'Failed to get user info'
+        };
+      }
     } catch (error: any) {
       return {
         success: false,
@@ -243,10 +340,20 @@ export const userAPI = {
   updateProfile: async (userData: Partial<User>): Promise<ApiResponse<User>> => {
     try {
       const response = await axiosInstance.put('/users/profile', userData);
-      return {
-        success: true,
-        data: response.data
-      };
+      const apiResponse = response.data;
+      
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        return {
+          success: true,
+          data: apiResponse.data,
+          message: apiResponse.message
+        };
+      } else {
+        return {
+          success: false,
+          error: apiResponse.message || 'Failed to update profile'
+        };
+      }
     } catch (error: any) {
       return {
         success: false,
@@ -259,10 +366,20 @@ export const userAPI = {
   getUserById: async (userId: string): Promise<ApiResponse<User>> => {
     try {
       const response = await axiosInstance.get(`/users/${userId}`);
-      return {
-        success: true,
-        data: response.data
-      };
+      const apiResponse = response.data;
+      
+      if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {
+        return {
+          success: true,
+          data: apiResponse.data,
+          message: apiResponse.message
+        };
+      } else {
+        return {
+          success: false,
+          error: apiResponse.message || 'Failed to get user'
+        };
+      }
     } catch (error: any) {
       return {
         success: false,

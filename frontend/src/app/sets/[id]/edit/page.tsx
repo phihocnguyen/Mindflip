@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '../../../../hooks/authStore';
 import Link from 'next/link';
+import { apiHelper } from '../../../../libs/api';
 
 interface Card {
   term: string;
@@ -47,29 +48,18 @@ export default function EditSet() {
 
   const fetchSet = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        router.push('/login');
-        return;
+      const response = await apiHelper.get(`/api/sets/${setId}`);
+      
+      if (response.success) {
+        const data = response.data as Set;
+        setSet(data);
+        setTitle(data.title);
+        setDescription(data.description || '');
+        setCards(data.cards.length > 0 ? data.cards : [{ term: '', definition: '' }]);
+        setIsPublic(data.isPublic);
+      } else {
+        throw new Error(response.error || 'Failed to fetch set');
       }
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/sets/${setId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch set');
-      }
-
-      const data = await response.json();
-      setSet(data);
-      setTitle(data.title);
-      setDescription(data.description || '');
-      setCards(data.cards.length > 0 ? data.cards : [{ term: '', definition: '' }]);
-      setIsPublic(data.isPublic);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -78,7 +68,18 @@ export default function EditSet() {
   };
 
   const addCard = () => {
+    const newCardIndex = cards.length;
     setCards([...cards, { term: '', definition: '' }]);
+    
+    // Focus on the term input of the new card and scroll to it after a short delay
+    setTimeout(() => {
+      const termInput = document.querySelector(`input[data-card-index="${newCardIndex}"][data-field="term"]`) as HTMLInputElement;
+      if (termInput) {
+        termInput.focus();
+        // Smooth scroll to the new card
+        termInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   };
 
   const removeCard = (index: number) => {
@@ -91,6 +92,28 @@ export default function EditSet() {
     const newCards = [...cards];
     newCards[index][field] = value;
     setCards(newCards);
+  };
+
+  // Handle tab key press to create new card
+  const handleTabKey = (index: number, field: 'term' | 'definition', e: React.KeyboardEvent) => {
+    // Check if Tab is pressed on definition field of last card
+    if (e.key === 'Tab' && field === 'definition' && index === cards.length - 1) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const newCardIndex = cards.length; // Save the new card index before adding
+      addCard();
+      
+      // Focus on the term input of the new card and scroll to it after a short delay
+      setTimeout(() => {
+        const termInput = document.querySelector(`input[data-card-index="${newCardIndex}"][data-field="term"]`) as HTMLInputElement;
+        if (termInput) {
+          termInput.focus();
+          // Smooth scroll to the new card
+          termInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -110,26 +133,18 @@ export default function EditSet() {
     setError(null);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/sets/${setId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim(),
-          cards: cards.filter(card => card.term.trim() && card.definition.trim()),
-          isPublic,
-        }),
+      const response = await apiHelper.put(`/api/sets/${setId}`, {
+        title: title.trim(),
+        description: description.trim(),
+        cards: cards.filter(card => card.term.trim() && card.definition.trim()),
+        isPublic,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update set');
+      if (response.success) {
+        router.push('/sets');
+      } else {
+        throw new Error(response.error || 'Failed to update set');
       }
-
-      router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -254,20 +269,13 @@ export default function EditSet() {
 
             {/* Cards Section */}
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Thẻ từ vựng
                 </h3>
-                <button
-                  type="button"
-                  onClick={addCard}
-                  className="inline-flex items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
-                >
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                  Thêm thẻ
-                </button>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Nhấn Tab từ ô "Định nghĩa" để tự động tạo thẻ mới
+                </p>
               </div>
 
               <div className="space-y-4">
@@ -299,6 +307,9 @@ export default function EditSet() {
                           type="text"
                           value={card.term}
                           onChange={(e) => updateCard(index, 'term', e.target.value)}
+                          onKeyDown={(e) => handleTabKey(index, 'term', e)}
+                          data-card-index={index}
+                          data-field="term"
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-600 dark:text-white transition-colors duration-200"
                           placeholder="Nhập thuật ngữ..."
                           required
@@ -313,6 +324,9 @@ export default function EditSet() {
                           type="text"
                           value={card.definition}
                           onChange={(e) => updateCard(index, 'definition', e.target.value)}
+                          onKeyDown={(e) => handleTabKey(index, 'definition', e)}
+                          data-card-index={index}
+                          data-field="definition"
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-600 dark:text-white transition-colors duration-200"
                           placeholder="Nhập định nghĩa..."
                           required
@@ -321,6 +335,20 @@ export default function EditSet() {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Add Card Button - Moved to bottom */}
+              <div className="mt-6 flex justify-center">
+                <button
+                  type="button"
+                  onClick={addCard}
+                  className="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Thêm thẻ mới
+                </button>
               </div>
             </div>
           </div>

@@ -7,6 +7,7 @@ import Sidebar from '../../components/Sidebar';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SetsGrid from './components/SetsGrid';
 import Link from 'next/link';
+import { apiHelper } from '../../libs/api';
 
 interface Card {
   term: string;
@@ -34,6 +35,11 @@ export default function SetsPage() {
   const { isAuthenticated, isLoading } = useAuthStore();
   const router = useRouter();
 
+  // Initialize filteredSets when sets change
+  useEffect(() => {
+    setFilteredSets(sets);
+  }, [sets]);
+
   useEffect(() => {
     console.log('SetsPage useEffect - isLoading:', isLoading, 'isAuthenticated:', isAuthenticated);
     
@@ -57,7 +63,8 @@ export default function SetsPage() {
   }, [sets, searchTerm, selectedFilter]);
 
   const filterSets = () => {
-    let filtered = sets;
+    // Ensure sets is always an array
+    let filtered = Array.isArray(sets) ? [...sets] : [];
 
     // Filter by search term
     if (searchTerm) {
@@ -90,25 +97,12 @@ export default function SetsPage() {
 
   const fetchSets = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        router.push('/login');
-        return;
+      const response = await apiHelper.get('/api/sets');
+      if (response.success) {
+        setSets(response.data as Set[]);
+      } else {
+        throw new Error(response.error || 'Failed to fetch sets');
       }
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/sets`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch sets');
-      }
-
-      const data = await response.json();
-      setSets(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -122,19 +116,13 @@ export default function SetsPage() {
     }
 
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/sets/${setId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete set');
+      const response = await apiHelper.delete(`/api/sets/${setId}`);
+      
+      if (response.success) {
+        setSets(sets.filter(set => set._id !== setId));
+      } else {
+        throw new Error(response.error || 'Failed to delete set');
       }
-
-      setSets(sets.filter(set => set._id !== setId));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete set');
     }

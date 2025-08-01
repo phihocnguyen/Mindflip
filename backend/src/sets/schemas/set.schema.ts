@@ -18,6 +18,9 @@ export class StudySet {
 
   @Prop({ type: [TermSchema], default: [] })
   terms: Term[];
+
+  @Prop({ type: Boolean, default: false })
+  isPublic: boolean;
 }
 
 export const StudySetSchema = SchemaFactory.createForClass(StudySet);

@@ -30,9 +30,13 @@ export async function GET(request: NextRequest) {
 // POST /api/sets - Tạo set mới
 export async function POST(request: NextRequest) {
   try {
+    const token = request.headers.get('authorization') ?? '';
+    const headers = token ? { Authorization: token } : undefined;
+    console.log(headers);
     const body = await request.json();
-    
-    const response = await apiHelper.post('/sets', body);
+    const response = await apiHelper.post('/api/sets', body, {
+      headers: headers
+    });
     
     if (response.success) {
       return NextResponse.json(response.data, { status: 201 });

@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosRequestHeaders, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 // Tạo axios instance với cấu hình cơ bản
 const axiosInstance: AxiosInstance = axios.create({
@@ -12,18 +12,20 @@ const axiosInstance: AxiosInstance = axios.create({
 // Interceptor để thêm token vào header trước mỗi request
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Lấy token từ localStorage hoặc sessionStorage
-    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-    
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+      if (token) {
+        // Nếu config.headers chưa có, khởi tạo đúng kiểu AxiosRequestHeaders
+        if (!config.headers) {
+          config.headers = {} as AxiosRequestHeaders;
+        }
+        // Gán token vào header Authorization
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
     }
-    
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Interceptor để xử lý response

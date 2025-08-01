@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsString, IsNotEmpty, IsArray, ValidateNested, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsArray, ValidateNested, IsOptional, IsBoolean } from 'class-validator';
 import { TermDto } from 'src/term/dto/term.dto';
 
 export class CreateSetDto {
@@ -19,4 +19,9 @@ export class CreateSetDto {
   @ValidateNested({ each: true })
   @Type(() => TermDto)
   terms: TermDto[];
+
+  @ApiProperty({ required: false, default: false, description: 'Đặt bộ từ là công khai?' })
+  @IsBoolean()
+  @IsOptional()
+  isPublic?: boolean;
 }

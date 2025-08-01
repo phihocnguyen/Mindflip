@@ -14,7 +14,7 @@ async function bootstrap() {
     credentials: true,
   });
   app.setGlobalPrefix('api'); // Thêm tiền tố /api cho tất cả các route
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   // Áp dụng interceptor transform toàn cục
   app.useGlobalInterceptors(new TransformInterceptor());
