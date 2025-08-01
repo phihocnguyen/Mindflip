@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { StudySet, StudySetDocument } from './schemas/set.schema';
 import { CreateSetDto } from './dto/create-set.dto';
 import { UpdateSetDto } from './dto/update-set.dto';
+import { UpdateTermDto } from 'src/term/dto/update-term.dto';
 
 @Injectable()
 export class SetsService {
@@ -54,5 +55,55 @@ export class SetsService {
     await this.findOne(id, userId); // findOne đã check quyền sở hữu
     await this.setModel.findByIdAndDelete(id).exec();
     return { message: 'Xóa bộ từ thành công.' };
+  }
+
+  async updateTermStatus(
+    setId: string,
+    termId: string,
+    updateTermDto: UpdateTermDto,
+    userId: string,
+  ): Promise<StudySet> {
+    const updatedSet = await this.setModel.findOneAndUpdate(
+      { _id: setId, creatorId: userId, 'terms._id': termId },
+      { $set: { 'terms.$.isLearned': updateTermDto.isLearned } },
+      { new: true },
+    ).exec();
+
+    if (!updatedSet) {
+      throw new NotFoundException(
+        'Không tìm thấy bộ từ, không có quyền truy cập, hoặc thẻ từ không tồn tại.',
+      );
+    }
+    const allTermsLearned = updatedSet.terms.every(term => term.isLearned);
+
+    if (allTermsLearned && !updatedSet.isCompleted) {
+      updatedSet.isCompleted = true;
+      return updatedSet.save();
+    }
+    if (!allTermsLearned && updatedSet.isCompleted) {
+      updatedSet.isCompleted = false;
+      return updatedSet.save();
+    }
+    return updatedSet;
+  }
+
+  async findRandomTermsForGame(
+    setId: string,
+    userId: string,
+    limit: number,
+  ): Promise<any[]> {
+    const studySet = await this.setModel.findById(setId).exec();
+
+    if (!studySet) {
+      throw new NotFoundException(`Bộ từ với ID "${setId}" không tồn tại.`);
+    }
+
+    if (studySet.creatorId.toString() != userId) {
+      throw new ForbiddenException('Bạn không có quyền truy cập vào tài nguyên này.');
+    }
+    
+    const shuffledTerms = [...studySet.terms].sort(() => 0.5 - Math.random());
+    
+    return shuffledTerms.slice(0, limit);
   }
 }

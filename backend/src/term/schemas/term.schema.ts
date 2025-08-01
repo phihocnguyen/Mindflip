@@ -7,6 +7,9 @@ export class Term {
 
   @Prop({ required: true })
   definition: string; // Định nghĩa
+
+  @Prop({ type: Boolean, default: false })
+  isLearned: boolean;
 }
 
 export const TermSchema = SchemaFactory.createForClass(Term);
