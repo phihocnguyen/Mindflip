@@ -66,7 +66,7 @@ export class SetsController {
     return this.setsService.updateTermStatus(setId, termId, updateTermDto, userId);
   }
 
-  @Get(':id/match-game')
+  @Get(':id/random-terms')
   @ApiOperation({ summary: 'Lấy dữ liệu cho game Nối từ' })
   getMatchGame(
     @Param('id') id: string,
