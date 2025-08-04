@@ -23,7 +23,6 @@ interface Set {
 }
 
 export default function Practice() {
-  const [sets, setSets] = useState<Set[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,20 +49,6 @@ export default function Practice() {
         router.push('/login');
         return;
       }
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/sets`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch sets');
-      }
-
-      const data = await response.json();
-      setSets(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -83,7 +68,7 @@ export default function Practice() {
           setSearchTerm={setSearchTerm}
           selectedFilter={selectedFilter}
           setSelectedFilter={setSelectedFilter}
-          sets={sets}
+          sets={[]}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
@@ -124,24 +109,24 @@ export default function Practice() {
 
             {/* Practice Modes */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {/* Flashcard Mode */}
+              {/* Match Game Mode */}
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
                 <div className="flex items-center mb-4">
                   <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
                     <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Flashcard</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Học từ vựng với thẻ ghi nhớ</p>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Match Game</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Nối từ với định nghĩa</p>
                   </div>
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Luyện tập với phương pháp flashcard truyền thống, lật thẻ để xem định nghĩa
+                  Luyện tập bằng cách nối từ vựng với định nghĩa tương ứng
                 </p>
                 <Link
-                  href="/practice/flashcard"
+                  href="/practice/match-game"
                   className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
                 >
                   Bắt đầu
@@ -168,7 +153,7 @@ export default function Practice() {
                   Trả lời câu hỏi trắc nghiệm để kiểm tra mức độ hiểu biết từ vựng
                 </p>
                 <Link
-                  href="/practice/quiz"
+                  href="/practice/quiz-game"
                   className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200"
                 >
                   Bắt đầu
@@ -295,15 +280,15 @@ export default function Practice() {
                   <div className="flex items-center">
                     <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg mr-3">
                       <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-sm font-medium text-gray-900 dark:text-white">Flashcard - Từ vựng cơ bản</h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Hoàn thành 15/20 thẻ • 2 giờ trước</p>
+                      <h3 className="text-sm font-medium text-gray-900 dark:text-white">Match Game - Từ vựng cơ bản</h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Hoàn thành 8/10 cặp • 2 giờ trước</p>
                     </div>
                   </div>
-                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">75%</span>
+                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">80%</span>
                 </div>
                 
                 <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
