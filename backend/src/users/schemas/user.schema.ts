@@ -26,6 +26,9 @@ export class User {
 
   @Prop({ default: null })
   emailVerificationToken?: string;
+
+  @Prop({ type: Number, default: 0 })
+  longestStreakRecord: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
