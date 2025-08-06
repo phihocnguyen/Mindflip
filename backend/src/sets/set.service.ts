@@ -5,11 +5,14 @@ import { StudySet, StudySetDocument } from './schemas/set.schema';
 import { CreateSetDto } from './dto/create-set.dto';
 import { UpdateSetDto } from './dto/update-set.dto';
 import { UpdateTermDto } from 'src/term/dto/update-term.dto';
+import { StudyLog, StudyLogDocument } from 'src/study-logs/schemas/study-log.schema';
+
 
 @Injectable()
 export class SetsService {
   constructor(
     @InjectModel(StudySet.name) private setModel: Model<StudySetDocument>,
+    @InjectModel(StudyLog.name) private logModel: Model<StudyLogDocument>,
   ) {}
 
   async create(createSetDto: CreateSetDto, userId: string): Promise<StudySet> {
@@ -63,28 +66,45 @@ export class SetsService {
     updateTermDto: UpdateTermDto,
     userId: string,
   ): Promise<StudySet> {
-    const updatedSet = await this.setModel.findOneAndUpdate(
-      { _id: setId, creatorId: userId, 'terms._id': termId },
-      { $set: { 'terms.$.isLearned': updateTermDto.isLearned } },
-      { new: true },
-    ).exec();
+    const { isLearned } = updateTermDto;
 
-    if (!updatedSet) {
-      throw new NotFoundException(
-        'Không tìm thấy bộ từ, không có quyền truy cập, hoặc thẻ từ không tồn tại.',
-      );
+    // Bước 1: Tìm document đầy đủ và kiểm tra quyền sở hữu
+    const studySet = await this.setModel.findOne({ _id: setId, creatorId: userId }).exec();
+    
+    if (!studySet) {
+      throw new NotFoundException('Không tìm thấy bộ từ hoặc bạn không có quyền truy cập.');
     }
-    const allTermsLearned = updatedSet.terms.every(term => term.isLearned);
+    const term = studySet.terms.find(t => t._id.toString() === termId);
+    if (!term) {
+      throw new NotFoundException(`Thẻ từ với ID "${termId}" không tồn tại trong bộ này.`);
+    }
+    
+    const wasAlreadyLearned = term.isLearned;
 
-    if (allTermsLearned && !updatedSet.isCompleted) {
-      updatedSet.isCompleted = true;
-      return updatedSet.save();
+    // Bước 3: Cập nhật trạng thái của thẻ từ
+    term.isLearned = isLearned;
+
+    // Bước 4: Ghi log nếu cần
+    if (isLearned && !wasAlreadyLearned) {
+      await this.logModel.create({
+        userId,
+        setId,
+        activityType: 'TERM_LEARNED',
+        durationSeconds: 0,
+        totalItems: 1,
+      });
     }
-    if (!allTermsLearned && updatedSet.isCompleted) {
-      updatedSet.isCompleted = false;
-      return updatedSet.save();
+
+    // Bước 5: Kiểm tra và cập nhật trạng thái hoàn thành của cả bộ từ
+    const allTermsLearned = studySet.terms.every(t => t.isLearned);
+    if (allTermsLearned && !studySet.isCompleted) {
+      studySet.isCompleted = true;
+    } else if (!allTermsLearned && studySet.isCompleted) {
+      studySet.isCompleted = false;
     }
-    return updatedSet;
+    
+    // Bước 6: Lưu lại tất cả các thay đổi vào database
+    return studySet.save();
   }
 
   async findRandomTermsForGame(

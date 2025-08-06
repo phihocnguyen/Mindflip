@@ -80,9 +80,13 @@ export class AnalyticsService {
   /**
    * Lấy dữ liệu cho biểu đồ tuần
    */
-  private async getWeeklyChartData(userId: Types.ObjectId) {
-    const startOfWeek = moment().startOf('isoWeek').toDate();
-    const endOfWeek = moment().endOf('day').toDate();
+   private async getWeeklyChartData(userId: Types.ObjectId) {
+    // Luôn làm việc với múi giờ Việt Nam một cách tường minh
+    const now = moment().tz('Asia/Ho_Chi_Minh');
+
+    // Lấy khoảng thời gian từ đầu tuần (Thứ Hai) đến cuối tuần (Chủ Nhật)
+    const startOfWeek = now.clone().startOf('isoWeek').toDate();
+    const endOfWeek = now.clone().endOf('isoWeek').toDate();
 
     const weeklyLogs = await this.logModel.aggregate([
       { $match: { userId, createdAt: { $gte: startOfWeek, $lte: endOfWeek } } },
@@ -90,8 +94,8 @@ export class AnalyticsService {
         $group: {
           _id: { $dayOfWeek: { date: '$createdAt', timezone: 'Asia/Ho_Chi_Minh' } }, // 1=CN, 2=T2,...
           totalDurationSeconds: { $sum: '$durationSeconds' },
-          totalCorrect: { $sum: '$correctAnswers' },
-          totalItems: { $sum: '$totalItems' },
+          totalCorrect: { $sum: { $ifNull: ['$correctAnswers', 0] } }, // Xử lý nếu trường là null
+          totalItems: { $sum: { $ifNull: ['$totalItems', 0] } }, // Xử lý nếu trường là null
         },
       },
       { $sort: { _id: 1 } },
@@ -102,10 +106,14 @@ export class AnalyticsService {
     const accuracy = Array(7).fill(0);
 
     weeklyLogs.forEach((item) => {
-      const dayIndex = (item._id + 5) % 7; // Chuyển đổi sang index 0-6 (T2-CN)
-      studyTime[dayIndex] = Math.round(item.totalDurationSeconds / 60);
-      accuracy[dayIndex] =
-        item.totalItems > 0 ? Math.round((item.totalCorrect / item.totalItems) * 100) : 0;
+      // Logic chuyển đổi index rõ ràng hơn: CN(1)->6, T2(2)->0, T3(3)->1,...
+      const dayIndex = item._id === 1 ? 6 : item._id - 2;
+      
+      if (dayIndex >= 0 && dayIndex < 7) {
+        studyTime[dayIndex] = Math.round(item.totalDurationSeconds / 60); // Đổi sang phút
+        accuracy[dayIndex] =
+          item.totalItems > 0 ? Math.round((item.totalCorrect / item.totalItems) * 100) : 0;
+      }
     });
 
     return { labels, accuracy, studyTime };
@@ -115,45 +123,50 @@ export class AnalyticsService {
    * Lấy dữ liệu cho biểu đồ tháng
    */
   private async getMonthlyChartData(userId: Types.ObjectId) {
-    const startOfMonth = moment().startOf('month');
-    const endOfMonth = moment().endOf('month');
+    const startOfMonth = moment().startOf('month').toDate();
+    const endOfMonth = moment().endOf('day').toDate();
 
     const monthlyLogs = await this.logModel.aggregate([
       {
         $match: {
           userId,
-          createdAt: { $gte: startOfMonth.toDate(), $lte: endOfMonth.toDate() },
-          activityType: { $in: [
-            'QUIZ', 
-            'MATCHING', 
-            'WRITING', 
-            'LISTENING', 
-            'SPEAKING', 
-            'FILL'
-          ] }, 
+          createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+          activityType: { $in: ['QUIZ', 'MATCHING', 'WRITING', 'LISTENING', 'SPEAKING', 'FILL'] },
           totalItems: { $gt: 0 },
+        },
+      },
+      // --- BẮT ĐẦU THAY ĐỔI LOGIC ---
+      {
+        $project: { // Thêm một bước để tính toán tuần trong tháng
+          correctAnswers: 1,
+          totalItems: 1,
+          // Chia ngày trong tháng cho 7 và làm tròn lên để có tuần (1, 2, 3, 4)
+          weekOfMonth: {
+            $ceil: {
+              $divide: [{ $dayOfMonth: { date: '$createdAt', timezone: 'Asia/Ho_Chi_Minh' } }, 7],
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$weekOfMonth', // Bây giờ nhóm theo tuần trong tháng (1, 2, 3, 4)
+          totalCorrect: { $sum: '$correctAnswers' },
+          totalItems: { $sum: '$totalItems' },
         },
       },
       { $sort: { _id: 1 } },
     ]);
-    const startWeek = startOfMonth.isoWeek();
-    const endWeek = endOfMonth.isoWeek();
-    
-    // Xử lý trường hợp tháng 12 có tuần 52, 53 và tháng 1 có tuần 1
-    const weekCount = (endWeek < startWeek) 
-      ? (moment(startOfMonth).isoWeeksInYear() - startWeek + 1) + endWeek 
-      : endWeek - startWeek + 1;
-      
-    const labels = Array.from({ length: weekCount }, (_, i) => `Tuần ${i + 1}`);
-    const accuracy = Array(weekCount).fill(0);
+    // --- KẾT THÚC THAY ĐỔI LOGIC ---
+
+    // Luôn luôn tạo ra 4 tuần
+    const labels = ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'];
+    const accuracy = Array(4).fill(0);
 
     monthlyLogs.forEach((item) => {
-      let weekIndex = item._id - startWeek;
-      if (item._id < startWeek) { // Ví dụ: Tuần 1 của năm mới so với tuần 52 của năm cũ
-        weekIndex = item._id + moment(startOfMonth).isoWeeksInYear() - startWeek;
-      }
-
-      if (weekIndex >= 0 && weekIndex < weekCount) {
+      // item._id bây giờ là 1, 2, 3, hoặc 4
+      const weekIndex = item._id - 1;
+      if (weekIndex >= 0 && weekIndex < 4) {
         accuracy[weekIndex] = Math.round((item.totalCorrect / item.totalItems) * 100);
       }
     });
@@ -227,29 +240,55 @@ export class AnalyticsService {
    * Tính toán các chỉ số chi tiết (so sánh với quá khứ)
    */
   private async _calculateDetailedStats(user: UserDocument) {
+    // --- 1. Thiết lập các khoảng thời gian ---
     const todayStart = moment().startOf('day').toDate();
     const yesterdayStart = moment().subtract(1, 'days').startOf('day').toDate();
     const sevenDaysAgo = moment().subtract(7, 'days').startOf('day').toDate();
     const fourteenDaysAgo = moment().subtract(14, 'days').startOf('day').toDate();
+    
+    // --- 2. Tính toán "Từ vựng mới hôm nay" ---
+    // Logic đúng: Chỉ đếm các log có activityType là 'TERM_LEARNED'
+    const newTermsToday = await this.logModel.countDocuments({
+      userId: user._id,
+      createdAt: { $gte: todayStart },
+      activityType: 'TERM_LEARNED',
+    });
 
-    // 1. Từ đã học hôm nay & % thay đổi
-    const termsToday = (await this.logModel.find({ userId: user._id, createdAt: { $gte: todayStart } })).reduce((sum, log) => sum + (log.totalItems ?? 0), 0);
-    const termsYesterday = (await this.logModel.find({ userId: user._id, createdAt: { $gte: yesterdayStart, $lt: todayStart } })).reduce((sum, log) => sum + (log.totalItems ?? 0), 0);
-    const newTermsChange = termsYesterday > 0 ? (termsToday - termsYesterday) / termsYesterday : (termsToday > 0 ? 1 : 0);
+    const newTermsYesterday = await this.logModel.countDocuments({
+      userId: user._id,
+      createdAt: { $gte: yesterdayStart, $lt: todayStart },
+      activityType: 'TERM_LEARNED',
+    });
 
-    // 2. Độ chính xác & % thay đổi
-    const recentLogs = await this.logModel.find({ userId: user._id, activityType: 'QUIZ', createdAt: { $gte: sevenDaysAgo } });
+    const newTermsChange = newTermsYesterday > 0 ? (newTermsToday - newTermsYesterday) / newTermsYesterday : (newTermsToday > 0 ? 1 : 0);
+
+    // --- 3. Tính toán "Độ chính xác & % thay đổi" ---
+    const accuracyActivityTypes = ['QUIZ', 'MATCHING', 'WRITING', 'LISTENING', 'SPEAKING', 'FILL'];
+    
+    // Lấy log của 7 ngày gần nhất
+    const recentLogs = await this.logModel.find({ 
+      userId: user._id, 
+      activityType: { $in: accuracyActivityTypes }, // Sửa lại: Dùng $in để tính accuracy trên tất cả các loại practice
+      createdAt: { $gte: sevenDaysAgo } 
+    });
     const recentCorrect = recentLogs.reduce((sum, log) => sum + (log.correctAnswers ?? 0), 0);
     const recentItems = recentLogs.reduce((sum, log) => sum + (log.totalItems ?? 0), 0);
     const averageAccuracy = recentItems > 0 ? recentCorrect / recentItems : 0;
 
-    const previousLogs = await this.logModel.find({ userId: user._id, activityType: 'QUIZ', createdAt: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo } });
+    // Lấy log của 7 ngày trước đó
+    const previousLogs = await this.logModel.find({ 
+      userId: user._id, 
+      activityType: { $in: accuracyActivityTypes }, // Sửa lại: Dùng $in
+      createdAt: { $gte: fourteenDaysAgo, $lt: sevenDaysAgo } 
+    });
     const previousCorrect = previousLogs.reduce((sum, log) => sum + (log.correctAnswers ?? 0), 0);
     const previousItems = previousLogs.reduce((sum, log) => sum + (log.totalItems ?? 0), 0);
     const previousAccuracy = previousItems > 0 ? previousCorrect / previousItems : 0;
-    const averageAccuracyChange = previousAccuracy > 0 ? (averageAccuracy - previousAccuracy) / previousAccuracy : (averageAccuracy > 0 ? 1 : 0);
+    
+    // Sửa lại: Tính toán sự thay đổi bằng phép trừ trực tiếp (theo yêu cầu của ông)
+    const averageAccuracyChange = averageAccuracy - previousAccuracy;
 
-    // 3. Chuỗi dài nhất & thay đổi
+    // --- 4. Tính toán "Chuỗi dài nhất & thay đổi" ---
     const longestStreak = await this._calculateLongestStreak(user._id);
     const longestStreakChange = longestStreak - user.longestStreakRecord;
     if (longestStreak > user.longestStreakRecord) {
@@ -257,8 +296,9 @@ export class AnalyticsService {
       await user.save();
     }
 
+    // --- 5. Trả về kết quả ---
     return {
-      newTermsToday: termsToday,
+      newTermsToday, // Sửa lại: Sửa lỗi typo ở đây
       newTermsChange,
       averageAccuracy,
       averageAccuracyChange,
