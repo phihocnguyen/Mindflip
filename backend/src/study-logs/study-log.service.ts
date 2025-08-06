@@ -18,4 +18,13 @@ export class StudyLogsService {
     });
     return newLog.save();
   }
+
+  async findRecent(userId: string, limit = 3): Promise<StudyLog[]> {
+    return this.logModel
+      .find({ userId: userId })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate('setId', 'title')
+      .exec();
+  }
 }
