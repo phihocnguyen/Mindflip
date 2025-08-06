@@ -13,7 +13,7 @@ export class StudyLog {
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'StudySet' })
   setId?: StudySet;
 
-  @Prop({ type: String, enum: ['MATCHING', 'QUIZ', 'WRITING', 'LISTENING', 'SPEAKING', 'FILL'], required: true })
+  @Prop({ type: String, enum: ['MATCHING', 'QUIZ', 'WRITING', 'LISTENING', 'SPEAKING', 'FILL', 'TERM_LEARNED'], required: true })
   activityType: string;
 
   @Prop({ type: Number, default: 0 })
