@@ -28,8 +28,20 @@ interface DashboardData {
   kpis: ProgressKpis;
   weeklyChart: WeeklyChart;
   monthlyChart: MonthlyChart;
-  recentActivities: any[]; // Added for ProgressStats
   detailedStats: any; // Added for ProgressStats
+}
+
+interface recentLog {
+  _id: string;
+  activityType: string;
+  durationSeconds: number;
+  correctAnswer: number; 
+  totalItems: number;
+  createdAt: string;
+  setId: {
+    _id: string;
+    title: string
+  }
 }
 
 export default function ProgressClient() {
@@ -39,12 +51,15 @@ export default function ProgressClient() {
   const [sets] = useState([]); // Mock data
   const [loading, setLoading] = useState(true);
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
+  const [recentLogs, setRecentLogs] = useState<recentLog[]>([]);
 
   useEffect(() => {
     async function fetchDashboard() {
       setLoading(true);
       try {
         const res : any = await apiHelper.get('/api/analytics/dashboard');
+        const recentLogRes : any = await apiHelper.get('/api/logs/recent');
+        setRecentLogs(recentLogRes.data);
         setDashboard(res.data)
       } catch (e) {
         setDashboard(null);
@@ -106,7 +121,7 @@ export default function ProgressClient() {
                   <ProgressOverview kpis={dashboard.kpis} />
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <ProgressCharts weeklyChart={dashboard.weeklyChart} monthlyChart={dashboard.monthlyChart} />
-                    <ProgressStats kpis={dashboard.kpis} detailedStats={dashboard.detailedStats} recentActivities={dashboard.recentActivities} />
+                    <ProgressStats kpis={dashboard.kpis} detailedStats={dashboard.detailedStats} recentLogs={recentLogs} />
                   </div>
                 </>
               ) : (

@@ -1,7 +1,10 @@
 'use client';
 
-import { BookOpen, Clock, Percent, Flame, TrendingUp, Award, Target, Calendar } from 'lucide-react';
-
+import { 
+  BookOpen, Clock, Target, Flame, Calendar, TrendingUp, 
+  HelpCircle, Shuffle, Pencil, Headphones, Mic, Type, Star, Award 
+} from 'lucide-react';
+import { useMemo } from 'react';
 interface ProgressKpis {
   completedSets: number;
   totalSets: number;
@@ -21,15 +24,20 @@ interface DetailedStats {
   longestStreakChange: number; // 2 = +2 ngày
 }
 
-interface RecentActivity {
-  id: string;
-  type: 'completed' | 'started' | 'mastered';
-  setTitle: string;
-  timestamp: string;
-  description: string;
+interface recentLog {
+  _id: string;
+  activityType: string;
+  durationSeconds: number;
+  correctAnswer: number; 
+  totalItems: number;
+  createdAt: string;
+  setId: {
+    _id: string;
+    title: string
+  }
 }
 
-export default function ProgressStats({ kpis, detailedStats, recentActivities }: { kpis: ProgressKpis, detailedStats: DetailedStats, recentActivities?: RecentActivity[] }) {
+export default function ProgressStats({ kpis, detailedStats, recentLogs }: { kpis: ProgressKpis, detailedStats: DetailedStats, recentLogs?: recentLog[] }) {
   if (!kpis || !detailedStats) {
     return (
       <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-xl p-8">
@@ -87,23 +95,66 @@ export default function ProgressStats({ kpis, detailedStats, recentActivities }:
     }
   ];
 
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'completed': return BookOpen;
-      case 'started': return Clock;
-      case 'mastered': return Award;
-      default: return BookOpen;
-    }
-  };
-
-  const getActivityColor = (type: string) => {
-    switch (type) {
-      case 'completed': return 'text-emerald-500';
-      case 'started': return 'text-blue-500';
-      case 'mastered': return 'text-yellow-500';
-      default: return 'text-gray-500';
-    }
-  };
+  const getActivityDetails = (log: recentLog) => {
+  switch (log.activityType) {
+    case 'QUIZ':
+      return { 
+        Icon: HelpCircle, 
+        color: 'text-emerald-500', 
+        gradient: 'from-emerald-500 to-teal-600',
+        text: `Hoàn thành Quiz "${log.setId.title}" với độ chính xác ${Math.round((log.correctAnswer! / log.totalItems!) * 100)}%`
+      };
+    case 'MATCHING':
+      return { 
+        Icon: Shuffle, 
+        color: 'text-blue-500', 
+        gradient: 'from-blue-500 to-indigo-600',
+        text: `Hoàn thành game Nối từ "${log.setId.title}"`
+      };
+    case 'WRITING':
+      return { 
+        Icon: Pencil, 
+        color: 'text-purple-500', 
+        gradient: 'from-purple-500 to-pink-600',
+        text: `Luyện viết bộ từ "${log.setId.title}"`
+      };
+    case 'LISTENING':
+      return { 
+        Icon: Headphones, 
+        color: 'text-orange-500', 
+        gradient: 'from-orange-500 to-red-600',
+        text: `Luyện nghe bộ từ "${log.setId.title}"`
+      };
+    case 'SPEAKING':
+        return { 
+          Icon: Mic, 
+          color: 'text-red-500', 
+          gradient: 'from-red-500 to-rose-600',
+          text: `Luyện nói bộ từ "${log.setId.title}"`
+        };
+    case 'FILL':
+        return { 
+          Icon: Type, 
+          color: 'text-cyan-500', 
+          gradient: 'from-cyan-500 to-sky-600',
+          text: `Làm bài điền từ "${log.setId.title}"`
+        };
+    case 'TERM_LEARNED':
+        return { 
+          Icon: Award, 
+          color: 'text-yellow-500', 
+          gradient: 'from-yellow-500 to-amber-600',
+          text: `Học một từ mới trong bộ "${log.setId.title}"`
+        };
+    default:
+      return { 
+        Icon: BookOpen, 
+        color: 'text-gray-500', 
+        gradient: 'from-gray-500 to-slate-600',
+        text: `Học bộ từ "${log.setId.title}"`
+      };
+  }
+};
 
   return (
     <div className="space-y-8">
@@ -176,38 +227,32 @@ export default function ProgressStats({ kpis, detailedStats, recentActivities }:
         </div>
 
         <div className="space-y-3">
-          {recentActivities && recentActivities.length > 0 ? recentActivities.map((activity, index) => {
-            const Icon = getActivityIcon(activity.type);
+          {recentLogs && recentLogs.length > 0 ? recentLogs.map((log, index) => {
+            const { Icon, color, gradient, text } = getActivityDetails(log);
             return (
               <div 
-                key={activity.id}
+                key={log._id}
                 className="group relative overflow-hidden bg-gradient-to-r from-gray-50/50 to-gray-100/50 dark:from-gray-700/50 dark:to-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
-                style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 bg-gradient-to-r ${
-                    activity.type === 'completed' ? 'from-emerald-500 to-teal-600' :
-                    activity.type === 'started' ? 'from-blue-500 to-indigo-600' :
-                    'from-yellow-500 to-orange-600'
-                  } rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={`w-10 h-10 bg-gradient-to-r ${gradient} rounded-lg flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300`}>
                     <Icon className="w-5 h-5 text-white" />
                   </div>
                   
                   <div className="flex-1 min-w-0">
-                    <h4 className={`font-semibold truncate ${getActivityColor(activity.type)} group-hover:text-opacity-80 transition-colors`}>
-                      {activity.setTitle}
+                    <h4 className={`font-semibold truncate ${color} group-hover:text-opacity-80 transition-colors`}>
+                      {text}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                      {activity.description}
-                    </p>
                   </div>
                   
                   <div className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
-                    {activity.timestamp}
+                    {new Date(log.createdAt).toLocaleDateString('vi-VN', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                    })}
                   </div>
                 </div>
-
-                {/* Hover effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
               </div>
             );
