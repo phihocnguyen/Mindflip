@@ -8,6 +8,7 @@ import { UsersModule } from './users/user.module';
 import { SetsModule } from './sets/set.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { StudyLogsModule } from './study-logs/study-log.module';
+import { PostsModule } from './posts/post.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { StudyLogsModule } from './study-logs/study-log.module';
     UsersModule,
     SetsModule,
     AnalyticsModule,
-    StudyLogsModule
+    StudyLogsModule,
+    PostsModule
   ],
   controllers: [AppController],
   providers: [AppService],
