@@ -64,6 +64,11 @@ button[aria-label]:focus {
   box-shadow: none;
 }
 
+button:focus {
+  outline: none;
+}
+
+
 /* Smooth transitions */
 * {
   transition: all 0.2s ease-in-out;

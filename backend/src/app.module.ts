@@ -9,6 +9,8 @@ import { SetsModule } from './sets/set.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { StudyLogsModule } from './study-logs/study-log.module';
 import { PostsModule } from './posts/post.module';
+import { CommunityModule } from './community/community.module';
+import { CommentsModule } from './comments/comment.module';
 
 @Module({
   imports: [
@@ -19,7 +21,9 @@ import { PostsModule } from './posts/post.module';
     SetsModule,
     AnalyticsModule,
     StudyLogsModule,
-    PostsModule
+    PostsModule,
+    CommunityModule,
+    CommentsModule
   ],
   controllers: [AppController],
   providers: [AppService],

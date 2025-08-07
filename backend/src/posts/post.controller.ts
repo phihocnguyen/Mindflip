@@ -8,6 +8,7 @@ import { PostCategory } from './schemas/post.schema';
 import { CreateCommentDto } from 'src/comments/dto/create-comment.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Request } from 'express';
+import { PaginationDto } from './dto/pagination.dto';
 
 
 @ApiBearerAuth()
@@ -28,9 +29,12 @@ export class PostsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Lấy danh sách bài đăng (có thể lọc theo category)' })
-  findAll(@Query('category') category?: PostCategory) {
-    return this.postsService.findAll(category);
+  @ApiOperation({ summary: 'Lấy danh sách bài đăng (có phân trang và lọc)' })
+  findAll(
+    @Query() paginationDto: PaginationDto,
+  ) {
+    const { page, limit, category } = paginationDto;
+    return this.postsService.findAll({ category, page, limit });
   }
   
   @Get(':id')

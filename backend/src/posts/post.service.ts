@@ -4,6 +4,13 @@ import { Model } from 'mongoose';
 import { Post, PostCategory, PostDocument } from './schemas/post.schema';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Types } from 'mongoose';
+
+interface FindAllPostsOptions {
+  category?: PostCategory;
+  page?: number;
+  limit?: number;
+}
+
 @Injectable()
 export class PostsService {
   constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
@@ -13,13 +20,26 @@ export class PostsService {
     return newPost.save();
   }
 
-  findAll(category?: PostCategory) {
+  async findAll(options: FindAllPostsOptions = {}) {
+    const { category, page = 1, limit = 5 } = options;
     const query = category ? { category } : {};
-    return this.postModel
-      .find(query)
-      .populate('author', 'name avatar') // Chỉ lấy name và avatar của tác giả
-      .sort({ createdAt: -1 })
-      .exec();
+    const [posts, total] = await Promise.all([
+      this.postModel
+        .find(query)
+        .populate('author', 'name avatar')
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      this.postModel.countDocuments(query).exec()
+    ]);
+
+    const hasMore = total > page * limit; 
+
+    return {
+      data: posts,
+      hasMore,
+    };
   }
 
   findOne(id: string) {
@@ -58,6 +78,7 @@ export class PostsService {
     } else {
       post.likes.push(userObjectId as any);
     }
-    return post.save();
+    const updatedPost = await post.save();
+    return updatedPost.populate('author', 'name avatar');
   }
 }
