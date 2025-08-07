@@ -253,15 +253,15 @@ export default function Practice() {
                     </svg>
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Hỗn hợp</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Kết hợp nhiều phương pháp</p>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Điền vào chỗ trống</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Luyện trí nhớ</p>
                   </div>
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Luyện tập với sự kết hợp của nhiều phương pháp học khác nhau
+                  Điền từ vào chỗ trống cho các văn bản ngẫu nhiên được sinh ra từ bộ từ vựng.
                 </p>
                 <Link
-                  href="/practice/mixed"
+                  href="/practice/fill-in-the-blanks"
                   className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors duration-200"
                 >
                   Bắt đầu

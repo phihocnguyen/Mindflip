@@ -41,6 +41,7 @@ export default function MatchGame() {
   const [sets, setSets] = useState<Set[]>([]);
   const [selectedSetId, setSelectedSetId] = useState<string>('');
   const [currentVocabulary, setCurrentVocabulary] = useState<{ term: string; definition: string }[]>([]);
+  const [gameStartTime, setGameStartTime] = useState<number | null>(null);
   const { isAuthenticated, isLoading } = useAuthStore();
   const router = useRouter();
 
@@ -62,6 +63,29 @@ export default function MatchGame() {
       initializeGame();
     }
   }, [currentVocabulary]);
+
+  useEffect(() => {
+    if (cards.length > 0 && !gameCompleted) {
+      setGameStartTime(Date.now());
+    }
+  }, [cards.length]);
+
+  useEffect(() => {
+    if (gameCompleted && selectedSetId) {
+      let durationSeconds = 0;
+      if (gameStartTime) {
+        durationSeconds = Math.floor((Date.now() - gameStartTime) / 1000);
+      }
+      apiHelper.post('/api/logs', {
+        setId: selectedSetId,
+        activityType: 'MATCHING',
+        durationSeconds,
+        correctAnswers: matchedPairs,
+        totalItems: currentVocabulary.length
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameCompleted]);
 
   const fetchSets = async () => {
     try {
@@ -86,7 +110,7 @@ export default function MatchGame() {
   const fetchVocabulary = async (setId: string) => {
     try {
       setLoading(true);
-      const response = await apiHelper.get<{ term: string; definition: string }[]>(`/api/sets/${setId}/match-game?limit=10`);
+      const response = await apiHelper.get<{ term: string; definition: string }[]>(`/api/sets/${setId}/random-terms?limit=10`);
       
       console.log('API response for match-game:', response); // Debug: Log full response
       if (response.success && response.data) {
@@ -232,6 +256,7 @@ export default function MatchGame() {
     setGameCompleted(false);
     setSelectedCard(null);
     setToastMessage(null);
+    setGameStartTime(null);
     if (currentVocabulary.length > 0) {
       initializeGame();
     }
@@ -430,15 +455,4 @@ export default function MatchGame() {
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
               <div 
                 className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-                style={{ width: `${(matchedPairs / currentVocabulary.length) * 100}%` }}
-              ></div>
-            </div>
-            <div className="text-center mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Tiến độ: {Math.round((matchedPairs / currentVocabulary.length) * 100)}%
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+                style={{ width: `${(matchedPairs / currentVocabulary.length) * 100}%`

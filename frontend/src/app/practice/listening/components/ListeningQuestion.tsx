@@ -27,7 +27,7 @@ export default function ListeningQuestion({
 
   const handlePlayAudio = () => {
     const utterance = new SpeechSynthesisUtterance(question.term);
-    utterance.lang = question.lang || 'en-US'; // Use term-specific language or fallback
+    utterance.lang = question.lang || 'en-US';
     window.speechSynthesis.speak(utterance);
   };
 
@@ -63,7 +63,7 @@ export default function ListeningQuestion({
           isInReviewMode
             ? question.userAnswer?.toLowerCase() === question.correctAnswer.toLowerCase()
               ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-              : 'border-red-500 bg-red-50 dark:bg-red-900/20'
+              : 'border-red-500 bg-red-50 dark:bg-red-900/20 text-gray-900 dark:text-gray-200'
             : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200'
         } disabled:opacity-50 transition-colors duration-200`}
         placeholder="Nhập từ vựng bạn nghe được"

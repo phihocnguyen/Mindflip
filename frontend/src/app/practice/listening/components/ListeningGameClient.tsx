@@ -43,6 +43,7 @@ export default function ListeningGameClient() {
   const [selectedSetId, setSelectedSetId] = useState<string>('');
   const [wordLimit, setWordLimit] = useState<number>(20);
   const [currentVocabulary, setCurrentVocabulary] = useState<VocabularyTerm[]>([]);
+  const [quizStartTime, setQuizStartTime] = useState<number | null>(null);
   const { isAuthenticated, isLoading } = useAuthStore();
   const router = useRouter();
 
@@ -90,6 +91,12 @@ export default function ListeningGameClient() {
       setQuestions([]);
     }
   }, [currentVocabulary]);
+
+  useEffect(() => {
+    if (questions.length > 0 && !quizCompleted) {
+      setQuizStartTime(Date.now());
+    }
+  }, [questions.length]);
 
   const initializeQuestions = () => {
     if (currentVocabulary.length < 1) return;
@@ -140,19 +147,34 @@ export default function ListeningGameClient() {
     setQuestions(prev => prev.map(q => q.id === questionId ? { ...q, userAnswer: answer.trim() } : q));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let correctCount = 0;
     questions.forEach(q => {
       if (q.userAnswer?.toLowerCase() === q.correctAnswer.toLowerCase()) correctCount++;
     });
     setScore(correctCount);
     setQuizCompleted(true);
+
+    let durationSeconds = 0;
+    if (quizStartTime) {
+      durationSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+    }
+    if (selectedSetId) {
+      await apiHelper.post('/api/logs', {
+        setId: selectedSetId,
+        activityType: 'LISTENING',
+        durationSeconds,
+        correctAnswers: correctCount,
+        totalItems: questions.length
+      });
+    }
   };
 
   const resetQuiz = () => {
     setScore(0);
     setQuizCompleted(false);
     setIsInReviewMode(false);
+    setQuizStartTime(null);
     if (currentVocabulary.length > 0) {
       initializeQuestions();
     }

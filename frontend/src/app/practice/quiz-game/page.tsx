@@ -6,6 +6,7 @@ import { useAuthStore } from '../../../hooks/authStore';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import Link from 'next/link';
 import { apiHelper } from '../../../libs/api';
+import { X } from 'lucide-react';
 
 // --- INTERFACES ---
 interface VocabularyTerm {
@@ -30,7 +31,15 @@ interface DragDropQuestion {
   userAnswer?: string;
 }
 
-type QuizQuestion = MultipleChoiceQuestion | DragDropQuestion;
+interface TrueFalseQuestion {
+  id: string;
+  type: 'true_false';
+  questionText: string;
+  correctAnswer: 'Đúng' | 'Sai';
+  userAnswer?: 'Đúng' | 'Sai';
+}
+
+type QuizQuestion = MultipleChoiceQuestion | DragDropQuestion | TrueFalseQuestion;
 
 interface Set {
   _id: string;
@@ -42,15 +51,17 @@ export default function QuizGame() {
   // --- STATE MANAGEMENT ---
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [score, setScore] = useState(0);
-  const [quizCompleted, setQuizCompleted] = useState(false); // Dùng để hiện Modal kết quả
-  const [isInReviewMode, setIsInReviewMode] = useState(false); // Dùng để bật chế độ xem lại đáp án
+  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [isInReviewMode, setIsInReviewMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sets, setSets] = useState<Set[]>([]);
   const [selectedSetId, setSelectedSetId] = useState<string>('');
+  const [wordLimit, setWordLimit] = useState<number>(20);
   const [currentVocabulary, setCurrentVocabulary] = useState<VocabularyTerm[]>([]);
   const { isAuthenticated, isLoading } = useAuthStore();
   const router = useRouter();
   const [dragItem, setDragItem] = useState<string | null>(null);
+  const [quizStartTime, setQuizStartTime] = useState<number | null>(null);
 
   // --- LOGIC FETCH DỮ LIỆU ---
   useEffect(() => {
@@ -70,6 +81,12 @@ export default function QuizGame() {
     }
   }, [currentVocabulary]);
 
+  useEffect(() => {
+    if (questions.length > 0 && !quizCompleted) {
+      setQuizStartTime(Date.now());
+    }
+  }, [questions.length]);
+
   const fetchSets = async () => {
     try {
       setLoading(true);
@@ -78,7 +95,7 @@ export default function QuizGame() {
         setSets(response.data);
         const firstSetId = response.data[0]._id;
         setSelectedSetId(firstSetId);
-        await fetchVocabulary(firstSetId);
+        await fetchVocabulary(firstSetId, wordLimit);
       } else {
         setCurrentVocabulary([]);
         setLoading(false);
@@ -89,13 +106,13 @@ export default function QuizGame() {
     }
   };
 
-  const fetchVocabulary = async (setId: string) => {
+  const fetchVocabulary = async (setId: string, limit: number) => {
     try {
       setLoading(true);
-      const response = await apiHelper.get<VocabularyTerm[]>(`/api/sets/${setId}/random-terms?limit=20`);
+      const response = await apiHelper.get<VocabularyTerm[]>(`/api/sets/${setId}/random-terms?limit=${limit}`);
       if (response.success && response.data) {
         if (response.data.length < 4) {
-          alert('Bộ từ vựng cần ít nhất 4 từ để tạo quiz.');
+          alert(`Bộ từ vựng này chỉ có ${response.data.length} từ. Cần ít nhất 4 từ để tạo quiz.`);
           setCurrentVocabulary([]);
         } else {
           setCurrentVocabulary(response.data);
@@ -115,7 +132,11 @@ export default function QuizGame() {
     if (currentVocabulary.length < 4) return;
     const shuffledVocab = [...currentVocabulary].sort(() => Math.random() - 0.5);
     const totalQuestions = shuffledVocab.length;
-    const mcCount = Math.round(totalQuestions * 0.6);
+
+    const mcCount = Math.round(totalQuestions * 0.4);
+    const tfCount = Math.round(totalQuestions * 0.3);
+    const ddCount = totalQuestions - mcCount - tfCount;
+
     const newQuestions: QuizQuestion[] = [];
 
     const mcVocab = shuffledVocab.slice(0, mcCount);
@@ -129,7 +150,25 @@ export default function QuizGame() {
       });
     });
 
-    const ddVocab = shuffledVocab.slice(mcCount);
+    const tfVocab = shuffledVocab.slice(mcCount, mcCount + tfCount);
+    tfVocab.forEach((termData, index) => {
+      let questionText = `"${termData.term}" có nghĩa là `;
+      let correctAnswer: 'Đúng' | 'Sai';
+      if (Math.random() > 0.5 || currentVocabulary.length < 2) {
+        questionText += `"${termData.definition}"`;
+        correctAnswer = 'Đúng';
+      } else {
+        const otherDefs = currentVocabulary.filter(v => v.definition !== termData.definition);
+        const randomIncorrectDef = otherDefs[Math.floor(Math.random() * otherDefs.length)].definition;
+        questionText += `"${randomIncorrectDef}"`;
+        correctAnswer = 'Sai';
+      }
+      newQuestions.push({
+        id: `tf-${index}`, type: 'true_false', questionText, correctAnswer,
+      });
+    });
+
+    const ddVocab = shuffledVocab.slice(mcCount + tfCount);
     ddVocab.forEach((termData, index) => {
       newQuestions.push({
         id: `dd-${index}`, type: 'drag_drop', definition: termData.definition,
@@ -140,9 +179,16 @@ export default function QuizGame() {
   };
 
   // --- LOGIC XỬ LÝ GAME ---
-  const handleAnswer = (questionId: string, answer: string) => {
+  const handleAnswer = (questionId: string, answer: any) => {
     if (isInReviewMode || quizCompleted) return;
     setQuestions(prev => prev.map(q => q.id === questionId ? { ...q, userAnswer: answer } : q));
+  };
+
+  const handleRemoveDragDropAnswer = (questionId: string) => {
+    if (isInReviewMode || quizCompleted) return;
+    setQuestions(prev => prev.map(q =>
+      q.id === questionId ? { ...q, userAnswer: undefined } : q
+    ));
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>, questionId: string) => {
@@ -154,44 +200,71 @@ export default function QuizGame() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let correctCount = 0;
     questions.forEach(q => { if (q.userAnswer === q.correctAnswer) correctCount++; });
     setScore(correctCount);
     setQuizCompleted(true);
+
+    // Calculate duration
+    let durationSeconds = 0;
+    if (quizStartTime) {
+      durationSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+    }
+
+    // Call /api/logs
+    if (selectedSetId) {
+      await apiHelper.post('/api/logs', {
+        setId: selectedSetId,
+        activityType: 'QUIZ',
+        durationSeconds,
+        correctAnswers: correctCount,
+        totalItems: questions.length
+      });
+    }
   };
 
   const resetQuiz = () => {
     setScore(0);
     setQuizCompleted(false);
     setIsInReviewMode(false);
-    if(currentVocabulary.length > 0) {
-        initializeQuiz();
+    setQuizStartTime(Date.now());
+    if (currentVocabulary.length > 0) {
+      initializeQuiz();
     }
   };
 
   const handleSetChange = (setId: string) => {
     setSelectedSetId(setId);
-    setQuizCompleted(false);
-    setIsInReviewMode(false);
-    setScore(0);
-    if (setId) {
-      fetchVocabulary(setId);
+  };
+
+  // CẬP NHẬT HÀM NÀY
+  const handleApplyChanges = () => {
+    if (selectedSetId) {
+      setQuizCompleted(false);
+      setIsInReviewMode(false);
+      setScore(0);
+      setQuestions([]); // Xóa câu hỏi cũ để kích hoạt LoadingSpinner toàn trang
+      fetchVocabulary(selectedSetId, wordLimit);
     }
   };
 
+  // --- BIẾN PHỤ VÀ MEMOIZATION ---
   const mcQuestions = useMemo(() => questions.filter((q): q is MultipleChoiceQuestion => q.type === 'multiple_choice'), [questions]);
+  const tfQuestions = useMemo(() => questions.filter((q): q is TrueFalseQuestion => q.type === 'true_false'), [questions]);
   const ddQuestions = useMemo(() => questions.filter((q): q is DragDropQuestion => q.type === 'drag_drop'), [questions]);
-  const ddTermBank = useMemo(() => ddQuestions.map(q => q.correctAnswer).sort(() => Math.random() - 0.5), [ddQuestions]);
 
+  const ddTermBank = useMemo(() => ddQuestions.map(q => q.correctAnswer).sort(() => Math.random() - 0.5), [ddQuestions]);
   const usedDragAndDropAnswers = new Set(ddQuestions.map(q => q.userAnswer).filter(Boolean));
+
   const answeredCount = questions.filter(q => q.userAnswer).length;
   const progressPercentage = questions.length > 0 ? (answeredCount / questions.length) * 100 : 0;
   const allAnswered = questions.length > 0 && answeredCount === questions.length;
   const interactionsDisabled = isInReviewMode || quizCompleted;
 
-
-  if (isLoading || (loading && questions.length === 0)) {
+  // CẬP NHẬT ĐIỀU KIỆN LOADING CHÍNH
+  const showFullPageLoading = isLoading || (loading && questions.length === 0);
+  if (showFullPageLoading) {
     return <LoadingSpinner isLoading={true} />;
   }
 
@@ -199,16 +272,35 @@ export default function QuizGame() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                    <Link href="/practice" className="mr-4 p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></Link>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Quiz Game</h1>
-                </div>
-                <div className="flex items-center space-x-4">
-                    {sets.length > 0 && <select value={selectedSetId} onChange={(e) => handleSetChange(e.target.value)} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">{sets.map((set) => (<option key={set._id} value={set._id}>{set.title}</option>))}</select>}
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Điểm: <span className="font-semibold text-blue-600 dark:text-blue-400">{score}</span> / {questions.length}</div>
-                </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Link href="/practice" className="mr-4 p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></Link>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Quiz Tổng Hợp</h1>
             </div>
+            <div className="flex items-center space-x-4">
+              {sets.length > 0 && (
+                <>
+                  <select value={selectedSetId} onChange={(e) => handleSetChange(e.target.value)} disabled={loading} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-70">
+                    {sets.map((set) => (<option key={set._id} value={set._id}>{set.title}</option>))}
+                  </select>
+                  <select value={wordLimit} onChange={(e) => setWordLimit(Number(e.target.value))} disabled={loading} className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-70">
+                    <option value={10}>10 từ</option>
+                    <option value={20}>20 từ</option>
+                    <option value={30}>30 từ</option>
+                    <option value={40}>40 từ</option>
+                    <option value={50}>50 từ</option>
+                  </select>
+                  {/* CẬP NHẬT NÚT ÁP DỤNG */}
+                  <button onClick={handleApplyChanges} disabled={loading} className="px-4 py-2 w-32 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200 disabled:bg-blue-400 disabled:cursor-not-allowed">
+                    Áp dụng
+                  </button>
+                </>
+              )}
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Điểm: <span className="font-semibold text-blue-600 dark:text-blue-400">{score}</span> / {questions.length}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -247,17 +339,15 @@ export default function QuizGame() {
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {q.options.map(option => {
-                            let optionClass = '';
-                            const isSelected = q.userAnswer === option;
-                            const isCorrect = option === q.correctAnswer;
+                            let optionClass = 'bg-gray-100 dark:bg-gray-700 border-transparent hover:border-blue-500 dark:text-gray-200';
                             if (isInReviewMode) {
-                              if (isCorrect) optionClass = 'bg-green-600 border-green-700 text-white';
-                              else if (isSelected) optionClass = 'bg-red-600 border-red-700 text-white';
+                              if (option === q.correctAnswer) optionClass = 'bg-green-600 border-green-700 text-white';
+                              else if (option === q.userAnswer) optionClass = 'bg-red-600 border-red-700 text-white';
                               else optionClass = 'bg-gray-100 dark:bg-gray-700 border-transparent opacity-50 cursor-default dark:text-gray-200';
-                            } else {
-                              optionClass = isSelected ? 'bg-blue-600 border-blue-700 text-white' : 'bg-gray-100 dark:bg-gray-700 border-transparent hover:border-blue-500 dark:text-gray-200';
+                            } else if (q.userAnswer === option) {
+                              optionClass = 'bg-blue-600 text-white';
                             }
-                            return <button key={option} onClick={() => handleAnswer(q.id, option)} disabled={interactionsDisabled} className={`p-3 rounded-lg text-left transition-all duration-200 border-2 ${optionClass}`}>{option}</button>
+                            return <button key={option} onClick={() => handleAnswer(q.id, option)} disabled={interactionsDisabled} className={`p-3 rounded-lg text-left transition-all duration-200 ${optionClass}`}>{option}</button>
                           })}
                         </div>
                       </div>
@@ -266,9 +356,44 @@ export default function QuizGame() {
                 </div>
               </div>
             )}
+            
+            {tfQuestions.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Phần 2: Đúng hay Sai</h2>
+                <div className="space-y-6">
+                  {tfQuestions.map((q, index) => {
+                    const isCorrect = isInReviewMode && q.userAnswer === q.correctAnswer;
+                    const isWrong = isInReviewMode && q.userAnswer !== q.correctAnswer;
+                    return (
+                      <div key={q.id}>
+                        <p className="text-lg text-gray-800 dark:text-gray-200 mb-3">
+                          {mcQuestions.length + index + 1}. {q.questionText}
+                          {isWrong && <span className="ml-2 text-sm font-normal text-red-500">(Sai)</span>}
+                          {isCorrect && <span className="ml-2 text-sm font-normal text-green-500">(Đúng)</span>}
+                        </p>
+                        <div className="flex items-center space-x-4">
+                          {(['Đúng', 'Sai'] as const).map(option => {
+                              let optionClass = 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:text-gray-200';
+                              if (isInReviewMode) {
+                                  if (option === q.correctAnswer) optionClass = 'bg-green-600 text-white';
+                                  else if (option === q.userAnswer) optionClass = 'bg-red-600 text-white';
+                                  else optionClass = 'bg-gray-200 dark:bg-gray-700 opacity-50 dark:text-gray-200';
+                              } else if (q.userAnswer === option) {
+                                  optionClass = 'bg-blue-600 text-white';
+                              }
+                              return <button key={option} onClick={() => handleAnswer(q.id, option)} disabled={interactionsDisabled} className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all duration-200 ${optionClass}`}>{option}</button>
+                          })}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             {ddQuestions.length > 0 && (
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Phần 2: Kéo thả</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Phần 3: Kéo thả</h2>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Định nghĩa</h3>
@@ -285,7 +410,10 @@ export default function QuizGame() {
                         return (
                           <div key={q.id}>
                             <div className="flex items-center gap-4">
-                              <div onDrop={(e) => handleDrop(e, q.id)} onDragOver={(e) => e.preventDefault()} className={`flex-shrink-0 w-48 h-14 flex items-center justify-center dark:text-gray-200 p-2 border-2 border-dashed rounded-lg text-center transition-all duration-200 ${dropZoneClass}`}>{q.userAnswer || 'Thả vào đây'}</div>
+                              <div onClick={() => q.userAnswer && handleRemoveDragDropAnswer(q.id)} onDrop={(e) => handleDrop(e, q.id)} onDragOver={(e) => e.preventDefault()} className={`group relative flex-shrink-0 w-48 h-14 flex items-center justify-center dark:text-gray-200 p-2 border-2 border-dashed rounded-lg text-center transition-all duration-200 ${dropZoneClass} ${q.userAnswer && !interactionsDisabled ? 'cursor-pointer' : ''}`}>
+                                {q.userAnswer || 'Thả vào đây'}
+                                {q.userAnswer && !interactionsDisabled && (<button onClick={(e) => { e.stopPropagation(); handleRemoveDragDropAnswer(q.id); }} className="absolute top-1 right-1 p-0.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 hover:bg-red-700 transition-all"><X size={12} /></button>)}
+                              </div>
                               <p className="text-gray-800 dark:text-gray-200">{q.definition}</p>
                             </div>
                             {isInReviewMode && !isCorrect && (<div className="pl-52 -mt-2 text-sm text-green-600 dark:text-green-500">Đáp án đúng: <span className="font-bold">{q.correctAnswer}</span></div>)}
@@ -297,9 +425,7 @@ export default function QuizGame() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Ngân hàng từ vựng</h3>
                     <div className="grid grid-cols-2 gap-3">
-                      {ddTermBank.
-                      filter(term => !usedDragAndDropAnswers.has(term))
-                      .map(term => (<div key={term} draggable={!interactionsDisabled} onDragStart={(e) => !interactionsDisabled && setDragItem(term)} className={`p-3 bg-white dark:bg-gray-700/80 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm text-center dark:text-gray-200 transition-all duration-200 ${interactionsDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-move hover:shadow-md'}`}>{term}</div>))}
+                      {ddTermBank.filter(term => !usedDragAndDropAnswers.has(term)).map(term => (<div key={term} draggable={!interactionsDisabled} onDragStart={(e) => !interactionsDisabled && setDragItem(term)} className={`p-3 bg-white dark:bg-gray-700/80 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm text-center dark:text-gray-200 transition-all duration-200 ${interactionsDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-move hover:shadow-md'}`}>{term}</div>))}
                     </div>
                   </div>
                 </div>
@@ -313,7 +439,7 @@ export default function QuizGame() {
         )}
 
         <div className="mt-12">
-          {!isInReviewMode && questions.length > 0 && (
+          {(!isInReviewMode && questions.length > 0) && (
             <div className="text-center"><button onClick={handleSubmit} disabled={!allAnswered} className={`px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-200 ${allAnswered ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg' : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'}`}>Nộp bài</button></div>
           )}
           {isInReviewMode && (
