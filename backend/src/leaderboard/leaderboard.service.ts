@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { Post, PostDocument } from '../posts/schemas/post.schema';
 import { TimeRange } from './dto/leaderboard-query.dto';
+import { StudyLog, StudyLogDocument } from 'src/study-logs/schemas/study-log.schema';
 
 interface GetLeaderboardOptions {
   userId: string;
@@ -18,6 +19,7 @@ export class LeaderboardService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
+    @InjectModel(StudyLog.name) private logModel: Model<StudyLogDocument>
   ) {}
 
   async getLeaderboard(options: GetLeaderboardOptions) {
@@ -51,21 +53,44 @@ export class LeaderboardService {
 
     // --- Lấy danh sách bảng xếp hạng ---
     const query = search ? { name: { $regex: search, $options: 'i' } } : {};
-    const [leaderboardData, totalLeaderboard] = await Promise.all([
+    const [leaderboardData, total] = await Promise.all([
         this.userModel.find(query)
             .sort({ score: -1 })
             .skip((page - 1) * limit)
             .limit(limit)
-            .select('name avatar score') // Chọn các trường cần thiết
+            .select('name avatar score')
             .exec(),
         this.userModel.countDocuments(query),
     ]);
-    
-    const leaderboard = {
-        data: leaderboardData,
-        hasMore: totalLeaderboard > page * limit,
-    };
+    const userIds = leaderboardData.map(u => u._id);
+    const lastActivities = await this.logModel.aggregate([
+        { $match: { userId: { $in: userIds } } },
+        { $sort: { createdAt: -1 } },
+        { $group: { _id: '$userId', lastActive: { $first: '$createdAt' } } }
+    ]);
+    const lastActivitiesMap = new Map(lastActivities.map(a => [a._id.toString(), a.lastActive]));
 
-    return { kpis, currentUser: currentUserData, leaderboard };
+    const finalLeaderboard = leaderboardData.map(user => ({
+        ...user.toObject(),
+        level: this._getLevel(user.score),
+        lastActive: lastActivitiesMap.get(user._id.toString()) || null,
+    }));
+
+
+    const totalPages = Math.ceil(total / limit);
+    
+    return {
+      kpis,
+      currentUser: currentUserData,
+      leaderboard: { data: finalLeaderboard, page, totalPages },
+    };
+  }
+
+  private _getLevel(score: number): string {
+    if (score > 9500) return 'Master';
+    if (score > 9000) return 'Expert';
+    if (score > 8500) return 'Advanced';
+    if (score > 8000) return 'Intermediate';
+    return 'Beginner';
   }
 }

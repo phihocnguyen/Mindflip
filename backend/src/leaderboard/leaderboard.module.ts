@@ -1,9 +1,10 @@
-import { Module, Post } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PostSchema } from 'src/posts/schemas/post.schema';
+import { Post, PostSchema } from 'src/posts/schemas/post.schema';
 import { User, UserSchema } from 'src/users/schemas/user.schema';
 import { LeaderboardController } from './leaderboard.controller';
 import { LeaderboardService } from './leaderboard.service';
+import { StudyLog, StudyLogSchema } from 'src/study-logs/schemas/study-log.schema';
 
 
 @Module({
@@ -11,6 +12,7 @@ import { LeaderboardService } from './leaderboard.service';
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Post.name, schema: PostSchema },
+      { name: StudyLog.name, schema: StudyLogSchema}
     ]),
   ],
   controllers: [LeaderboardController],
