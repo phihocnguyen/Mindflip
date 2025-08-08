@@ -29,6 +29,9 @@ export class User {
 
   @Prop({ type: Number, default: 0 })
   longestStreakRecord: number;
+
+  @Prop({ type: Number, default: 0, index: true })
+  score: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

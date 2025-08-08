@@ -11,6 +11,7 @@ import { StudyLogsModule } from './study-logs/study-log.module';
 import { PostsModule } from './posts/post.module';
 import { CommunityModule } from './community/community.module';
 import { CommentsModule } from './comments/comment.module';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { CommentsModule } from './comments/comment.module';
     StudyLogsModule,
     PostsModule,
     CommunityModule,
-    CommentsModule
+    CommentsModule,
+    LeaderboardModule
   ],
   controllers: [AppController],
   providers: [AppService],

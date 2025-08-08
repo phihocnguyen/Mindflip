@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Post, PostCategory, PostDocument } from './schemas/post.schema';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Types } from 'mongoose';
+import { User, UserDocument } from 'src/users/schemas/user.schema';
 
 interface FindAllPostsOptions {
   category?: PostCategory;
@@ -13,7 +14,10 @@ interface FindAllPostsOptions {
 
 @Injectable()
 export class PostsService {
-  constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
+  constructor(
+    @InjectModel(Post.name) private postModel: Model<PostDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+  ) {}
 
   create(createPostDto: CreatePostDto, authorId: string) {
     const newPost = new this.postModel({ ...createPostDto, author: authorId });
@@ -75,8 +79,10 @@ export class PostsService {
 
     if (userIndex > -1) {
       post.likes.splice(userIndex, 1);
+      await this.userModel.updateOne({ _id: post.author }, { $inc: { score: -1 } });
     } else {
       post.likes.push(userObjectId as any);
+      await this.userModel.updateOne({ _id: post.author }, { $inc: { score: 1 } });
     }
     const updatedPost = await post.save();
     return updatedPost.populate('author', 'name avatar');

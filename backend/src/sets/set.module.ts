@@ -5,11 +5,13 @@ import { SetsController } from './set.controller';
 import { StudySet, StudySetSchema } from './schemas/set.schema';
 import { StudyLogsModule } from 'src/study-logs/study-log.module';
 import { StudyLog, StudyLogSchema } from 'src/study-logs/schemas/study-log.schema';
+import { User, UserSchema } from 'src/users/schemas/user.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: StudySet.name, schema: StudySetSchema },
-      { name: StudyLog.name, schema: StudyLogSchema }
+      { name: StudyLog.name, schema: StudyLogSchema },
+      { name: User.name, schema: UserSchema }
     ]),
     StudyLogsModule
   ],

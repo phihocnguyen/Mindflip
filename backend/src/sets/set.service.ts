@@ -6,6 +6,7 @@ import { CreateSetDto } from './dto/create-set.dto';
 import { UpdateSetDto } from './dto/update-set.dto';
 import { UpdateTermDto } from 'src/term/dto/update-term.dto';
 import { StudyLog, StudyLogDocument } from 'src/study-logs/schemas/study-log.schema';
+import { User, UserDocument } from 'src/users/schemas/user.schema';
 
 
 @Injectable()
@@ -13,6 +14,7 @@ export class SetsService {
   constructor(
     @InjectModel(StudySet.name) private setModel: Model<StudySetDocument>,
     @InjectModel(StudyLog.name) private logModel: Model<StudyLogDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   async create(createSetDto: CreateSetDto, userId: string): Promise<StudySet> {
@@ -68,7 +70,6 @@ export class SetsService {
   ): Promise<StudySet> {
     const { isLearned } = updateTermDto;
 
-    // Bước 1: Tìm document đầy đủ và kiểm tra quyền sở hữu
     const studySet = await this.setModel.findOne({ _id: setId, creatorId: userId }).exec();
     
     if (!studySet) {
@@ -81,10 +82,8 @@ export class SetsService {
     
     const wasAlreadyLearned = term.isLearned;
 
-    // Bước 3: Cập nhật trạng thái của thẻ từ
     term.isLearned = isLearned;
 
-    // Bước 4: Ghi log nếu cần
     if (isLearned && !wasAlreadyLearned) {
       await this.logModel.create({
         userId,
@@ -95,15 +94,17 @@ export class SetsService {
       });
     }
 
-    // Bước 5: Kiểm tra và cập nhật trạng thái hoàn thành của cả bộ từ
     const allTermsLearned = studySet.terms.every(t => t.isLearned);
     if (allTermsLearned && !studySet.isCompleted) {
       studySet.isCompleted = true;
+      const points = studySet.terms.length * 10;
+      await this.userModel.updateOne({ _id: userId }, { $inc: { score: points } });
     } else if (!allTermsLearned && studySet.isCompleted) {
       studySet.isCompleted = false;
     }
+
     
-    // Bước 6: Lưu lại tất cả các thay đổi vào database
+    
     return studySet.save();
   }
 
