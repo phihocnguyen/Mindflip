@@ -20,7 +20,7 @@ export class LeaderboardController {
     @Query() query: LeaderboardQueryDto,
   ) {
     const userId = req.user!['_id'];
-    const { search, timeRange } = query;
+    const { search, timeRange, level } = query;
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
     return this.leaderboardService.getLeaderboard({
@@ -29,6 +29,7 @@ export class LeaderboardController {
       limit,
       search,
       timeRange,
+      level
     });
   }
 }

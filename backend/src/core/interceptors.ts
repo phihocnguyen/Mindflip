@@ -22,11 +22,16 @@ import {
       next: CallHandler,
     ): Observable<Response<T>> {
       return next.handle().pipe(
-        map((data) => ({
-          statusCode: context.switchToHttp().getResponse().statusCode,
-          message: data.message || 'Success', // Lấy message từ controller hoặc mặc định là 'Success'
-          data: data.result || data, // Lấy data từ controller
-        })),
+        map((data) => {
+          const message = (data && typeof data === 'object' && data.message) ? data.message : 'Success';
+          const resultData = (data && typeof data === 'object' && data.result) ? data.result : data;
+
+          return {
+            statusCode: context.switchToHttp().getResponse().statusCode,
+            message: message,
+            data: resultData,
+          };
+        }),
       );
     }
   }

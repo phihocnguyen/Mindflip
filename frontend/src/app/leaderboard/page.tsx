@@ -32,6 +32,7 @@ interface LeaderboardEntry {
 interface FilterOptions {
   timeRange: string;
   search: string;
+  level: string;
 }
 
 export default function LeaderboardPage() {
@@ -44,7 +45,7 @@ export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<FilterOptions>({ timeRange: 'all', search: '' });
+  const [filters, setFilters] = useState<FilterOptions>({ timeRange: 'all', search: '', level: 'all' });
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -61,6 +62,11 @@ export default function LeaderboardPage() {
         timeRange: currentFilters.timeRange,
         search: currentFilters.search,
       });
+
+      if (currentFilters.level && currentFilters.level !== 'all') {
+        params.append('level', currentFilters.level);
+      }
+
       const response = await axiosInstance.get(`/api/leaderboard?${params.toString()}`);
       const data = response.data.data
       if (isNewFilter) {
@@ -78,7 +84,7 @@ export default function LeaderboardPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [filters]);
 
   useEffect(() => {
     if (isAuthenticated) {

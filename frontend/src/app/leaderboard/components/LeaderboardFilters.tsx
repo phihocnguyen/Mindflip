@@ -9,17 +9,24 @@ interface LeaderboardFiltersProps {
 interface FilterOptions {
   timeRange: string;
   search: string;
+  level: string;
 }
 
 
 
 export default function LeaderboardFilters({ onFilterChange }: LeaderboardFiltersProps) {
-  const [filters, setFilters] = useState<FilterOptions>({ timeRange: 'all', search: '' });
+  const [filters, setFilters] = useState<FilterOptions>({ 
+    timeRange: 'all', 
+    search: '',
+    level: 'all' 
+  });
+
+  const LEVELS = ['Master', 'Expert', 'Advanced', 'Intermediate', 'Beginner'];
 
   useEffect(() => {
     const handler = setTimeout(() => {
       onFilterChange(filters);
-    }, 500); // Gửi request sau 500ms không gõ nữa
+    }, 500);
 
     return () => clearTimeout(handler);
   }, [filters, onFilterChange]);
@@ -28,9 +35,6 @@ export default function LeaderboardFilters({ onFilterChange }: LeaderboardFilter
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleReset = () => {
-    setFilters({ timeRange: 'all', search: '' });
-  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
@@ -76,60 +80,22 @@ export default function LeaderboardFilters({ onFilterChange }: LeaderboardFilter
             />
           </div>
         </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Cấp độ
+          </label>
+          <select
+            value={filters.level}
+            onChange={(e) => handleFilterChange('level', e.target.value)}
+            className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white ..."
+          >
+            <option value="all">Tất cả cấp độ</option>
+            {LEVELS.map(level => (
+              <option key={level} value={level}>{level}</option>
+            ))}
+          </select>
+        </div>
       </div>
-
-      {/* Quick Filter Buttons
-      <div className="mt-6 flex flex-wrap gap-2">
-        <button
-          onClick={() => handleFilterChange('timeRange', 'week')}
-          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-            filters.timeRange === 'week'
-              ? 'bg-indigo-600 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-          }`}
-        >
-          Tuần này
-        </button>
-        <button
-          onClick={() => handleFilterChange('timeRange', 'month')}
-          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-            filters.timeRange === 'month'
-              ? 'bg-indigo-600 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-          }`}
-        >
-          Tháng này
-        </button>
-        <button
-          onClick={() => handleFilterChange('category', 'toeic')}
-          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-            filters.category === 'toeic'
-              ? 'bg-indigo-600 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-          }`}
-        >
-          TOEIC
-        </button>
-        <button
-          onClick={() => handleFilterChange('category', 'ielts')}
-          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-            filters.category === 'ielts'
-              ? 'bg-indigo-600 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-          }`}
-        >
-          IELTS
-        </button>
-        <button
-          onClick={() => {
-            setFilters({ timeRange: 'all', category: 'all', searchTerm: '' });
-            onFilterChange({ timeRange: 'all', category: 'all', searchTerm: '' });
-          }}
-          className="px-4 py-2 text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-        >
-          Xóa bộ lọc
-        </button>
-      </div> */}
     </div>
   );
 } 

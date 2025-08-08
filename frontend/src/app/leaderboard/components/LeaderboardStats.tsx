@@ -93,7 +93,9 @@ export default function LeaderboardStats({ kpis, currentUser, loading }: Leaderb
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Thứ hạng của bạn</p>
-              <p className="text-lg font-bold text-gray-900 dark:text-white">#{currentUser.rank} / {kpis.totalUsers.toLocaleString('vi-VN')}</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white">
+                <span className="text-blue-600 dark:text-yellow-400">#{currentUser.rank}</span> / {kpis.totalUsers.toLocaleString('vi-VN')}
+              </p>
             </div>
           </div>
           <div className="text-right">

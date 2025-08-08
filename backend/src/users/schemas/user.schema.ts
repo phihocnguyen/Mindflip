@@ -32,6 +32,12 @@ export class User {
 
   @Prop({ type: Number, default: 0, index: true })
   score: number;
+
+  @Prop()
+  createdAt: Date;
+
+  @Prop()
+  updatedAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
