@@ -12,6 +12,10 @@ export interface Comment {
   likes: string[];
   parentCommentId?: string | null;
   replyCount: number;
+  replyToUser?: {
+    _id: string;
+    name: string;
+  } | null;
 }
 
 export interface Post {

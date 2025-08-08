@@ -65,9 +65,12 @@ export class PostsController {
     return this.commentsService.create(postId, createCommentDto, req.user!['_id']);
   }
 
-  @Get(':id/comments')
-  @ApiOperation({ summary: 'Lấy tất cả bình luận của một bài đăng' })
-  findAllComments(@Param('id') postId: string) {
-    return this.commentsService.findAllForPost(postId);
+  @Get(':postId/comments')
+  @ApiOperation({ summary: 'Lấy tất cả bình luận (gốc) của một bài đăng' })
+  findAllComments(
+    @Param('postId') postId: string,
+    @Query() paginationDto: PaginationDto,
+  ) {
+    return this.commentsService.findAllForPost(postId, paginationDto);
   }
 }

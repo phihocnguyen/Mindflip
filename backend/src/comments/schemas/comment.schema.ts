@@ -24,6 +24,9 @@ export class Comment {
 
   @Prop({ type: Number, default: 0 })
   replyCount: number;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', default: null })
+  replyToUser: User;
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);

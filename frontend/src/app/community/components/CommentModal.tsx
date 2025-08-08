@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, Fragment } from 'react';
+import { useEffect, useState, useCallback, Fragment, useRef } from 'react';
 import { Post, Comment } from '../types';
 import { axiosInstance } from '~/libs';
 import TimeAgo from 'react-timeago';
@@ -9,16 +9,17 @@ import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';
 import {useAuthStore} from '~/hooks/authStore';
 import { Heart, MessageCircle } from 'lucide-react';
 import CommentItem from './CommentItem';
-const COMMENT_LIMIT = 10;
+const COMMENT_LIMIT = 5;
 const formatter = buildFormatter(viStrings);
 
 interface CommentModalProps {
   postId: string;
   onClose: () => void;
   onCommentPosted: (postId: string, newCommentCount: number) => void;
+  onPostUpdate: (updatedPost: Post) => void;
 }
 
-export default function CommentModal({ postId, onClose, onCommentPosted }: CommentModalProps) {
+export default function CommentModal({ postId, onClose, onCommentPosted, onPostUpdate }: CommentModalProps) {
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [page, setPage] = useState(1);
@@ -31,8 +32,10 @@ export default function CommentModal({ postId, onClose, onCommentPosted }: Comme
   const [likingComment, setLikingComment] = useState<string | null>(null);
   const [isLikingPost, setIsLikingPost] = useState(false);
   const [repliesState, setRepliesState] = useState<{ [key: string]: { list: Comment[], page: number, hasMore: boolean } }>({});
-  const [activeReplyBox, setActiveReplyBox] = useState<string | null>(null);
+  const commentInputRef = useRef<HTMLInputElement>(null);
 
+
+  
   const fetchComments = useCallback(async (pageNum: number, initialLoad = false) => {
     if (!hasMore && !initialLoad) return;
     if (pageNum > 1) setLoadingMore(true);
@@ -41,7 +44,7 @@ export default function CommentModal({ postId, onClose, onCommentPosted }: Comme
       const res = await axiosInstance.get(`/api/posts/${postId}/comments?page=${pageNum}&limit=${COMMENT_LIMIT}`);
       const data = res.data.data
       if (data) {
-        setComments(prev => initialLoad ? data: [...prev, ...data]);
+        setComments(prev => initialLoad ? data.data: [...prev, ...data.data]);
         setHasMore(data.hasMore);
       } else {
         setHasMore(false);
@@ -83,13 +86,12 @@ export default function CommentModal({ postId, onClose, onCommentPosted }: Comme
     
     setIsSubmitting(true);
     try {
-      const response = await axiosInstance.post(`/api/posts/${postId}/comments`, { content: newComment });
-      const createdComment = response.data.data;
-      if(createdComment.status === 201) {
-        setComments(prev => [createdComment, ...prev]);
-        setNewComment('');
-        onCommentPosted(postId, post.commentCount + 1);
-      }
+      const res = await axiosInstance.post(`/api/posts/${postId}/comments`, { content: newComment });
+      const createdComment = res.data.data;
+      setComments(prev => [createdComment, ...prev]);
+      setNewComment('');
+      onCommentPosted(postId, post.commentCount + 1);
+
     } catch (error) {
       console.error("Lỗi khi gửi bình luận:", error);
     } finally {
@@ -115,35 +117,24 @@ export default function CommentModal({ postId, onClose, onCommentPosted }: Comme
         }
     };
 
-    const handleLikePost = async () => {
-      if(!post || isLikingPost) return;
-      setIsLikingPost(true);
-      try {
-          const response = await axiosInstance.post(`/api/posts/${post._id}/like`);
-          const updatedPost = response.data.data;
-          setPost(updatedPost);
-      } catch (error) {
-          console.error("Error liking post in modal:", error);
-      } finally {
-          setIsLikingPost(false);
-      }
+  const handleLikePost = async () => {
+    if(!post || isLikingPost) return;
+    setIsLikingPost(true);
+    try {
+        const response = await axiosInstance.post(`/api/posts/${post._id}/like`);
+        const updatedPost = response.data.data;
+        setPost(updatedPost);
+        onPostUpdate(updatedPost);
+    } catch (error) {
+        console.error("Error liking post in modal:", error);
+    } finally {
+        setIsLikingPost(false);
     }
+  }
 
-    const handleFetchReplies = async (parentCommentId: string) => {
-      const currentState = repliesState[parentCommentId] || { list: [], page: 1, hasMore: true };
-      if (!currentState.hasMore) return;
-
-      const res = await axiosInstance.get(`/api/comments/${parentCommentId}/replies?page=${currentState.page}&limit=${COMMENT_LIMIT}`);
-      if (res.data.statusCode === 200) {
-        setRepliesState(prev => ({
-          ...prev,
-          [parentCommentId]: {
-            list: [...currentState.list, ...res.data.data.data],
-            page: currentState.page + 1,
-            hasMore: res.data.data.hasMore,
-          }
-        }));
-      }
+  const handleReplyClick = (authorName: string) => {
+    setNewComment(`@${authorName} `);
+    commentInputRef.current?.focus();
   };
 
   const handleReplySubmit = async (parentCommentId: string, content: string) => {
@@ -260,9 +251,7 @@ export default function CommentModal({ postId, onClose, onCommentPosted }: Comme
                       comment={comment}
                       onLike={handleLikeComment}
                       onReplySubmit={handleReplySubmit}
-                      replies={repliesState[comment._id]?.list || []}
-                      hasMoreReplies={repliesState[comment._id]?.hasMore ?? (comment.replyCount > 0)}
-                      onFetchReplies={handleFetchReplies}
+                      onReplyClick={handleReplyClick}
                     />
                   ))}
                   

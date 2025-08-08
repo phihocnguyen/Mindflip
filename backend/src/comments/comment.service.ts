@@ -21,15 +21,34 @@ export class CommentsService {
     });
     // Tăng commentCount trên bài post
     await this.postModel.updateOne({ _id: postId }, { $inc: { commentCount: 1 } });
-    return newComment.save();
+    const savedComment = await newComment.save();
+    return savedComment.populate('author', 'name avatar');
   }
 
-  findAllForPost(postId: string) {
-    return this.commentModel
-      .find({ post: postId })
-      .populate('author', 'name avatar')
-      .sort({ createdAt: 1 })
-      .exec();
+  async findAllForPost(postId: string, paginationDto: PaginationDto) {
+    const { page = 1, limit = 5 } = paginationDto;
+    const query = { 
+      post: new Types.ObjectId(postId),
+      parentCommentId: null 
+    };
+    
+    const [comments, total] = await Promise.all([
+      this.commentModel
+        .find(query)
+        .populate('author', 'name avatar')
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      this.commentModel.countDocuments(query).exec()
+    ]);
+    
+    const hasMore = total > page * limit;
+
+    return {
+      data: comments,
+      hasMore,
+    };
   }
 
   async toggleLike(commentId: string, userId: string) {
@@ -52,25 +71,29 @@ export class CommentsService {
   }
 
   async addReply(parentCommentId: string, createCommentDto: CreateCommentDto, authorId: string) {
-    const parentComment = await this.commentModel.findById(parentCommentId);
-    if (!parentComment) {
-      throw new NotFoundException('Bình luận gốc không tồn tại.');
+    const repliedComment = await this.commentModel.findById(parentCommentId);
+    if (!repliedComment) {
+      throw new NotFoundException('Bình luận bạn đang trả lời không tồn tại.');
     }
-
+    const ultimateParentId = repliedComment.parentCommentId || repliedComment._id;
     const newReply = new this.commentModel({
       ...createCommentDto,
       author: authorId,
-      post: parentComment.post,
-      parentCommentId: parentCommentId,
+      post: repliedComment.post,
+      parentCommentId: ultimateParentId,
+      replyToUser: repliedComment.author
     });
 
     await Promise.all([
-      this.commentModel.updateOne({ _id: parentCommentId }, { $inc: { replyCount: 1 } }),
-      this.postModel.updateOne({ _id: parentComment.post }, { $inc: { commentCount: 1 } })
+      this.commentModel.updateOne({ _id: ultimateParentId }, { $inc: { replyCount: 1 } }),
+      this.postModel.updateOne({ _id: repliedComment.post }, { $inc: { commentCount: 1 } })
     ]);
     
     const savedReply = await newReply.save();
-    return savedReply.populate('author', 'name avatar');
+    return savedReply.populate([
+        { path: 'author', select: 'name avatar' },
+        { path: 'replyToUser', select: 'name' }
+    ]);
   }
 
   async findReplies(parentCommentId: string, paginationDto: PaginationDto) {
@@ -80,7 +103,10 @@ export class CommentsService {
     const [replies, total] = await Promise.all([
       this.commentModel
         .find(query)
-        .populate('author', 'name avatar')
+        .populate([
+            { path: 'author', select: 'name avatar' },
+            { path: 'replyToUser', select: 'name' }
+        ])
         .sort({ createdAt: 1 })
         .skip((page - 1) * limit)
         .limit(limit)

@@ -110,6 +110,12 @@ export default function CommunityPage() {
     fetchPosts(nextPage);
   };
 
+  const handlePostUpdate = (updatedPost: Post) => {
+    setPosts(currentPosts => 
+      currentPosts.map(p => (p._id === updatedPost._id ? updatedPost : p))
+    );
+  };
+
   return (
     <>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -225,6 +231,7 @@ export default function CommunityPage() {
                 postId={modalPostId} 
                 onClose={() => setModalPostId(null)} 
                 onCommentPosted={handleCommentPosted}
+                onPostUpdate={handlePostUpdate}
               />
             )}
           </div>
