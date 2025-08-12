@@ -97,6 +97,11 @@ export class SetsService {
     const allTermsLearned = studySet.terms.every(t => t.isLearned);
     if (allTermsLearned && !studySet.isCompleted) {
       studySet.isCompleted = true;
+      await this.logModel.create({
+        userId,
+        setId,
+        activityType: 'SET_COMPLETED',
+      });
       const points = studySet.terms.length * 10;
       await this.userModel.updateOne({ _id: userId }, { $inc: { score: points } });
     } else if (!allTermsLearned && studySet.isCompleted) {

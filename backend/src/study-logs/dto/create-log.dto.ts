@@ -8,7 +8,8 @@ export enum ActivityType {
   LISTENING = 'LISTENING',
   SPEAKING = 'SPEAKING',
   FILL = "FILL",
-  TERM_LEARNED = 'TERM_LEARNED'
+  TERM_LEARNED = 'TERM_LEARNED',
+  SET_COMPLETED = "SET_COMPLETED"
 }
 
 export class CreateStudyLogDto {

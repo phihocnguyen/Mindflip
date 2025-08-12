@@ -6,6 +6,8 @@ import { StudySet, StudySetDocument } from '../sets/schemas/set.schema';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { StudyLog, StudyLogDocument } from 'src/study-logs/schemas/study-log.schema';
 
+const ACCURACY_ACTIVITIES = ['QUIZ', 'MATCHING', 'WRITING', 'LISTENING', 'SPEAKING', 'FILL'];
+
 @Injectable()
 export class AnalyticsService {
   constructor(
@@ -57,11 +59,11 @@ export class AnalyticsService {
 
     const totalStudyTimeSeconds = logs.reduce((sum, log) => sum + log.durationSeconds, 0);
 
-    const quizLogs = logs.filter(
-      (log) => log.activityType === 'QUIZ' && typeof log.totalItems === 'number' && log.totalItems > 0,
+    const practiceLogs = logs.filter(
+      (log) => ACCURACY_ACTIVITIES.includes(log.activityType) && (log.totalItems ?? 0) > 0
     );
-    const totalCorrect = quizLogs.reduce((sum, log) => sum + (log.correctAnswers ?? 0), 0);
-    const totalQuestions = quizLogs.reduce((sum, log) => sum + log.totalItems!, 0);
+    const totalCorrect = practiceLogs.reduce((sum, log) => sum + (log.correctAnswers ?? 0), 0);
+    const totalQuestions = practiceLogs.reduce((sum, log) => sum + (log.totalItems ?? 0), 0);
     const overallAccuracy = totalQuestions > 0 ? totalCorrect / totalQuestions : 0;
 
     const currentStreak = await this._calculateCurrentStreak(userId);
@@ -89,13 +91,13 @@ export class AnalyticsService {
     const endOfWeek = now.clone().endOf('isoWeek').toDate();
 
     const weeklyLogs = await this.logModel.aggregate([
-      { $match: { userId, createdAt: { $gte: startOfWeek, $lte: endOfWeek } } },
+      { $match: { userId, activityType: { $in: ACCURACY_ACTIVITIES }, createdAt: { $gte: startOfWeek, $lte: endOfWeek } } },
       {
         $group: {
-          _id: { $dayOfWeek: { date: '$createdAt', timezone: 'Asia/Ho_Chi_Minh' } }, // 1=CN, 2=T2,...
+          _id: { $dayOfWeek: { date: '$createdAt', timezone: 'Asia/Ho_Chi_Minh' } },
           totalDurationSeconds: { $sum: '$durationSeconds' },
-          totalCorrect: { $sum: { $ifNull: ['$correctAnswers', 0] } }, // Xử lý nếu trường là null
-          totalItems: { $sum: { $ifNull: ['$totalItems', 0] } }, // Xử lý nếu trường là null
+          totalCorrect: { $sum: { $ifNull: ['$correctAnswers', 0] } },
+          totalItems: { $sum: { $ifNull: ['$totalItems', 0] } },
         },
       },
       { $sort: { _id: 1 } },
@@ -131,7 +133,7 @@ export class AnalyticsService {
         $match: {
           userId,
           createdAt: { $gte: startOfMonth, $lte: endOfMonth },
-          activityType: { $in: ['QUIZ', 'MATCHING', 'WRITING', 'LISTENING', 'SPEAKING', 'FILL'] },
+          activityType: { $in: ACCURACY_ACTIVITIES },
           totalItems: { $gt: 0 },
         },
       },
@@ -261,11 +263,7 @@ export class AnalyticsService {
     });
 
     const newTermsChange = newTermsYesterday > 0 ? (newTermsToday - newTermsYesterday) / newTermsYesterday : (newTermsToday > 0 ? 1 : 0);
-
-    // --- 3. Tính toán "Độ chính xác & % thay đổi" ---
     const accuracyActivityTypes = ['QUIZ', 'MATCHING', 'WRITING', 'LISTENING', 'SPEAKING', 'FILL'];
-    
-    // Lấy log của 7 ngày gần nhất
     const recentLogs = await this.logModel.find({ 
       userId: user._id, 
       activityType: { $in: accuracyActivityTypes }, // Sửa lại: Dùng $in để tính accuracy trên tất cả các loại practice

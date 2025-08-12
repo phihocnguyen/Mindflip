@@ -455,4 +455,15 @@ export default function MatchGame() {
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
               <div 
                 className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-                style={{ width: `${(matchedPairs / currentVocabulary.length) * 100}%`
+                style={{ width: `${(matchedPairs / currentVocabulary.length) * 100}%` }}
+              ></div>
+            </div>
+            <div className="text-right text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {matchedPairs} / {currentVocabulary.length} đã hoàn thành
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
