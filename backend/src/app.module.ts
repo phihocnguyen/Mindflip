@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config'; // Import ConfigModule
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/user.module';
 import { SetsModule } from './sets/set.module';
@@ -27,7 +27,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     CommunityModule,
     CommentsModule,
     LeaderboardModule,
-    DashboardModule
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],
