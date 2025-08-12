@@ -12,6 +12,7 @@ import { PostsModule } from './posts/post.module';
 import { CommunityModule } from './community/community.module';
 import { CommentsModule } from './comments/comment.module';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
     PostsModule,
     CommunityModule,
     CommentsModule,
-    LeaderboardModule
+    LeaderboardModule,
+    DashboardModule
   ],
   controllers: [AppController],
   providers: [AppService],
