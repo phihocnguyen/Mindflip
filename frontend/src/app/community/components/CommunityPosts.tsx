@@ -39,7 +39,7 @@ export default function CommunityPosts({ posts, loading, onLike, onCommentPosted
             onLike={onLike}
             onCommentClick={setModalPostId}
             onDelete={onDeletePost}
-            currentUserId={post.author._id}
+            currentUserId={post.author?._id || ''}
           />
         ))}
         {posts.length === 0 && (

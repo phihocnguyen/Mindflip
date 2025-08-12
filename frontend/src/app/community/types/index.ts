@@ -20,7 +20,7 @@ export interface Comment {
 
 export interface Post {
   _id: string;
-  author: Author;
+  author: Author | null;
   content: string;
   category: string;
   likes: string[];

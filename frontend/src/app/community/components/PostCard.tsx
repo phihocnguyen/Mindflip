@@ -48,15 +48,15 @@ export default function PostCard({ post, onLike, onCommentClick, onDelete }: Pos
     <div className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0">
       <div className="flex items-start space-x-3 mb-4">
         <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-          {post.author.avatar 
+          {post.author && post.author.avatar 
             ? <img src={post.author.avatar} alt={post.author.name} className="w-10 h-10 rounded-full object-cover" /> 
-            : post.author.name.charAt(0).toUpperCase()
+            : post.author?.name.charAt(0).toUpperCase()
           }
         </div>
         <div className="flex-1">
           {/* --- PHẦN JSX ĐÃ ĐƯỢC HOÀN THIỆN --- */}
           <div className="flex items-center space-x-2 mb-1">
-            <h3 className="font-medium text-gray-900 dark:text-white">{post.author.name}</h3>
+            <h3 className="font-medium text-gray-900 dark:text-white">{post.author?.name}</h3>
             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(post.category)}`}>
               {getCategoryLabel(post.category)}
             </span>
