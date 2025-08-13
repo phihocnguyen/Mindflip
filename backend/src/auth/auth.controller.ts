@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Req, Res, UseGuards, ValidationPipe, HttpS
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-auth.dto';
-import { LoginDto } from './dto/.dto';
+import { LoginDto } from './dto/login.dto';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 @ApiTags('Auth')
