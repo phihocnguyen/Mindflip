@@ -86,11 +86,6 @@ Với giao diện sạch sẽ, phản hồi nhanh và lộ trình học cá nhâ
 *   **Phím tắt**: Điều hướng và thao tác nhanh bằng bàn phím
     
 
-📁 Cấu trúc dự án
------------------
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   bashSao chépChỉnh sửamindflip/  ├── backend/                    # Ứng dụng NestJS  │   ├── src/                    # Mã nguồn backend  │   │   ├── modules/            # Các module tính năng (auth, sets, users, ...)  │   │   ├── common/             # Tiện ích và interceptor chung  │   │   ├── config/              # Cấu hình ứng dụng  │   │   └── main.ts             # Entry point  │   ├── package.json            # Dependencies backend  │   └── ...  └── frontend/                   # Ứng dụng Next.js      ├── src/                    # Mã nguồn frontend      │   ├── app/                # App Router pages & layouts      │   │   ├── dashboard/      # Bảng điều khiển & phân tích      │   │   ├── sets/           # Quản lý bộ từ vựng      │   │   ├── login/          # Trang xác thực      │   │   └── ...      │   ├── components/         # UI components tái sử dụng      │   ├── hooks/              # Custom hooks      │   ├── libs/               # Thư viện & API clients      │   └── ...      ├── package.json            # Dependencies frontend      └── ...   `
-
 🚀 Bắt đầu
 ----------
 
@@ -101,19 +96,6 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 *   MongoDB (local hoặc cloud)
     
 *   npm hoặc yarn
-    
-
-### Cài đặt
-
-1.  **Backend**:
-    
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   npm run start:dev   `
-
-1.  **Frontend**:
-    
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   npm install  npm run dev   `
 
 ### Biến môi trường
 
