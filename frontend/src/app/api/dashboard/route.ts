@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 // GET /api/dashboard - Lấy dữ liệu dashboard
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get('authToken')?.value;
     
     if (!token) {

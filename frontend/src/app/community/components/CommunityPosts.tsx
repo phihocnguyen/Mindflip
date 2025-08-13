@@ -54,6 +54,7 @@ export default function CommunityPosts({ posts, loading, onLike, onCommentPosted
           postId={modalPostId}
           onClose={() => setModalPostId(null)}
           onCommentPosted={onCommentPosted}
+          onPostUpdate={() => {}} // Empty function as we don't need to update the post in this context
         />
       )}
     </div>

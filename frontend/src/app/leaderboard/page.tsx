@@ -36,7 +36,7 @@ interface FilterOptions {
   level: string;
 }
 
-export default function LeaderboardPage() {
+function LeaderboardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -214,5 +214,15 @@ export default function LeaderboardPage() {
         </div>
       </div>
     </>
+  );
+}
+
+export const dynamic = "force-dynamic";
+
+export default function LeaderboardPage() {
+  return (
+    <Suspense fallback={<div>Đang tải...</div>}>
+      <LeaderboardContent />
+    </Suspense>
   );
 } 

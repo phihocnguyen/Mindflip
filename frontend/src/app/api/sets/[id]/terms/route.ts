@@ -4,14 +4,16 @@ import { apiHelper } from '~/libs/api';
 // GET /api/sets/[id]/terms - Lấy danh sách terms của set
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Resolve the params promise
+    const resolvedParams = await params;
     const { searchParams } = new URL(request.url);
     const page = searchParams.get('page') || '1';
     const limit = searchParams.get('limit') || '50';
 
-    const response = await apiHelper.get(`/sets/${params.id}/terms?page=${page}&limit=${limit}`);
+    const response = await apiHelper.get(`/sets/${resolvedParams.id}/terms?page=${page}&limit=${limit}`);
     
     if (response.success) {
       return NextResponse.json(response.data);
@@ -32,12 +34,14 @@ export async function GET(
 // POST /api/sets/[id]/terms - Thêm term mới vào set
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Resolve the params promise
+    const resolvedParams = await params;
     const body = await request.json();
     
-    const response = await apiHelper.post(`/sets/${params.id}/terms`, body);
+    const response = await apiHelper.post(`/sets/${resolvedParams.id}/terms`, body);
     
     if (response.success) {
       return NextResponse.json(response.data, { status: 201 });

@@ -32,15 +32,17 @@ export async function GET(request: NextRequest) {
 // PUT /api/sets/[id] - Cập nhật set
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Resolve the params promise
+    const resolvedParams = await params;
     const token = request.headers.get('authorization') ?? '';
     const headers = token ? { Authorization: token } : undefined;
 
     const body = await request.json();
 
-    const response = await apiHelper.patch(`/sets/${params.id}`, body, {
+    const response = await apiHelper.patch(`/sets/${resolvedParams.id}`, body, {
       headers: headers,
     });
 
@@ -60,13 +62,15 @@ export async function PATCH(
 // DELETE /api/sets/[id] - Xóa set
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Resolve the params promise
+    const resolvedParams = await params;
     const token = request.headers.get('authorization') ?? '';
     const headers = token ? { Authorization: token } : undefined;
 
-    const response = await apiHelper.delete(`/sets/${params.id}`, {
+    const response = await apiHelper.delete(`/sets/${resolvedParams.id}`, {
       headers: headers,
     });
 

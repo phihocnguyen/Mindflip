@@ -2,8 +2,11 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "../../../hooks/useAuth";
+import { Suspense } from "react";
 
-export default function AuthCallbackPage() {
+export const dynamic = "force-dynamic";
+
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const login = useAuthStore((state) => state.login);
@@ -26,5 +29,13 @@ export default function AuthCallbackPage() {
         <p>Đang xác thực với Google...</p>
       </div>
     </div>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<div>Đang tải...</div>}>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }

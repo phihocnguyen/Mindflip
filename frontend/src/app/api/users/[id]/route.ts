@@ -4,10 +4,12 @@ import { apiHelper } from '~/libs/api';
 // GET /api/users/[id] - Lấy thông tin user cụ thể
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const response = await apiHelper.get(`/users/${params.id}`);
+    // Resolve the params promise
+    const resolvedParams = await params;
+    const response = await apiHelper.get(`/users/${resolvedParams.id}`);
     
     if (response.success) {
       return NextResponse.json(response.data);
@@ -28,12 +30,14 @@ export async function GET(
 // PUT /api/users/[id] - Cập nhật thông tin user
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Resolve the params promise
+    const resolvedParams = await params;
     const body = await request.json();
     
-    const response = await apiHelper.put(`/users/${params.id}`, body);
+    const response = await apiHelper.put(`/users/${resolvedParams.id}`, body);
     
     if (response.success) {
       return NextResponse.json(response.data);
@@ -54,10 +58,12 @@ export async function PUT(
 // DELETE /api/users/[id] - Xóa user (admin only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const response = await apiHelper.delete(`/users/${params.id}`);
+    // Resolve the params promise
+    const resolvedParams = await params;
+    const response = await apiHelper.delete(`/users/${resolvedParams.id}`);
     
     if (response.success) {
       return NextResponse.json({ message: 'User deleted successfully' });

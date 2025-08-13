@@ -100,7 +100,7 @@ export default function CommentModal({ postId, onClose, onCommentPosted, onPostU
         };
       });
       
-      onCommentPosted(postId, post.commentCount + 1);
+      onCommentPosted(postId, (post?.commentCount || 0) + 1);
 
     } catch (error) {
       console.error("Lỗi khi gửi bình luận:", error);
@@ -173,7 +173,7 @@ export default function CommentModal({ postId, onClose, onCommentPosted, onPostU
         };
       });
       
-      onCommentPosted(postId, post.commentCount + 1);
+      onCommentPosted(postId, (post?.commentCount || 0) + 1);
     }
   };
 
