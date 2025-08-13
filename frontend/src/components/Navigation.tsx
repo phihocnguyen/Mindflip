@@ -44,7 +44,7 @@ export default function Navigation() {
   };
 
   return (
-    <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-lg border-b border-gray-200 dark:border-gray-800 fixed top-0 left-0 right-0 z-50 h-16">
+    <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-lg border-b border-gray-200 dark:border-gray-800 fixed top-0 left-0 right-0 z-50 py-1">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="">
@@ -55,7 +55,7 @@ export default function Navigation() {
               <Image 
                 src={mounted ? (darkMode ? "/my-logo.png" : "/my-logo-black.png") : "/my-logo-black.png"} 
                 alt="Mindflip Logo" 
-                width={256} 
+                width={128} 
                 height={64} 
                 priority
               />

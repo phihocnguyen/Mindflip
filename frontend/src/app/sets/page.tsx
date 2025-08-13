@@ -18,8 +18,9 @@ interface Set {
   _id: string;
   title: string;
   description: string;
-  cards: Card[];
+  terms: Card[];
   isPublic: boolean;
+  isCompleted: boolean;
   createdAt: string;
   updatedAt: string;
 }

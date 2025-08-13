@@ -1,7 +1,10 @@
-import { redirect } from 'next/navigation';
-import SidebarWrapper from '../dashboard/SidebarWrapper';
-import axiosInstance from '../../libs/axios';
+'use client';
+
+import { useState, useEffect } from 'react';
+import Sidebar from '../../components/Sidebar';
 import Link from 'next/link';
+import { useAuthStore } from '../../hooks/authStore';
+import axiosInstance from '../../libs/axios';
 
 interface BlogPost {
   id: string;
@@ -36,10 +39,10 @@ const mockBlogPosts: BlogPost[] = [
     excerpt: 'Learn the most important English words you need when traveling abroad. Master accommodation, itinerary, reservation, and more essential terms that will make your journey smoother and more enjoyable.',
     content: 'Full blog content would go here...',
     author: {
-      name: 'Nguyen Thuy Linh',
+      name: 'Nguyễn Phi Học',
       avatar: ''
     },
-    createdAt: '2023-06-15',
+    createdAt: '2025-08-05',
     readTime: 5,
     category: 'Travel',
     tags: ['vocabulary', 'travel', 'beginner']
@@ -50,10 +53,10 @@ const mockBlogPosts: BlogPost[] = [
     excerpt: 'Essential expressions to confidently participate in business meetings. Learn how to open meetings, express agreement, handle disagreements, and close discussions professionally.',
     content: 'Full blog content would go here...',
     author: {
-      name: 'Tran Minh Duc',
+      name: 'Nguyễn Phi Học',
       avatar: ''
     },
-    createdAt: '2023-06-10',
+    createdAt: '2025-08-05',
     readTime: 8,
     category: 'Business',
     tags: ['business', 'meetings', 'professional']
@@ -64,10 +67,10 @@ const mockBlogPosts: BlogPost[] = [
     excerpt: 'Understanding common English idioms will greatly improve your fluency. Master expressions like "break the ice", "bite the bullet", and "spill the beans" to sound more natural.',
     content: 'Full blog content would go here...',
     author: {
-      name: 'Pham Quoc Khanh',
+      name: 'Nguyễn Phi Học',
       avatar: ''
     },
-    createdAt: '2023-06-05',
+    createdAt: '2025-08-05',
     readTime: 10,
     category: 'Expressions',
     tags: ['idioms', 'expressions', 'fluency']
@@ -78,10 +81,10 @@ const mockBlogPosts: BlogPost[] = [
     excerpt: 'Learn how to write formal academic papers in English with proper vocabulary and structure. Master academic phrases, formal expressions, and citation techniques.',
     content: 'Full blog content would go here...',
     author: {
-      name: 'Le Thi Hoa',
+      name: 'Nguyễn Phi Học',
       avatar: ''
     },
-    createdAt: '2023-05-28',
+    createdAt: '2025-08-05',
     readTime: 12,
     category: 'Academic',
     tags: ['academic', 'writing', 'formal']
@@ -92,10 +95,10 @@ const mockBlogPosts: BlogPost[] = [
     excerpt: 'Master the challenging sounds in English pronunciation. Learn the difference between similar sounds and practice with audio examples.',
     content: 'Full blog content would go here...',
     author: {
-      name: 'Hoang Van Nam',
+      name: 'Nguyễn Phi Học',
       avatar: ''
     },
-    createdAt: '2023-05-20',
+    createdAt: '2025-08-05',
     readTime: 7,
     category: 'Pronunciation',
     tags: ['pronunciation', 'speaking', 'phonics']
@@ -106,10 +109,10 @@ const mockBlogPosts: BlogPost[] = [
     excerpt: 'Understand when to use present perfect and when to use past simple tense. Clear explanations with practical examples.',
     content: 'Full blog content would go here...',
     author: {
-      name: 'Mai Thi Thu',
+      name: 'Nguyễn Phi Học',
       avatar: ''
     },
-    createdAt: '2023-05-18',
+    createdAt: '2025-08-05',
     readTime: 6,
     category: 'Grammar',
     tags: ['grammar', 'tenses', 'intermediate']
@@ -143,19 +146,63 @@ async function fetchSidebarData(): Promise<Set[]> {
   }
 }
 
-export default async function BlogListPage() {
-  const sets = await fetchSidebarData();
-  
+export default function BlogListPage() {
+  const [sets, setSets] = useState<Set[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedSets = await fetchSidebarData();
+        setSets(fetchedSets);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchData();
+    } else {
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  if (loading) {
+    return <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50 dark:from-gray-900 dark:via-blue-900/10 dark:to-indigo-900/10 flex items-center justify-center">Đang tải...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50 dark:from-gray-900 dark:via-blue-900/10 dark:to-indigo-900/10 relative">
-      <SidebarWrapper initialSets={sets} />
+      {/* Sidebar */}
+      <Sidebar
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        selectedFilter={selectedFilter}
+        setSelectedFilter={setSelectedFilter}
+        sets={sets}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
 
       {/* Main Content - Enhanced responsive layout with proper spacing for right panels */}
       <div className="lg:ml-64 transition-all duration-300 ease-in-out">
         {/* Enhanced Mobile Header */}
         <div className="lg:hidden bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 px-4 py-3 sticky top-0 z-30">
           <div className="flex items-center justify-between">
-            <button className="flex items-center p-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-all duration-200">
+            <button 
+              onClick={toggleSidebar}
+              className="flex items-center p-2 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-all duration-200"
+            >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
@@ -181,23 +228,23 @@ export default async function BlogListPage() {
                 </span>
               </h1>
               <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                Discover engaging articles, master new vocabulary, and improve your English skills through carefully curated content
+                Khám phá những bài viết hấp dẫn, làm chủ từ vựng mới và nâng cao kỹ năng tiếng Anh của bạn thông qua nội dung được chọn lọc kỹ lưỡng.
               </p>
             </div>
             
             {/* Stats Section */}
-            <div className="grid grid-cols-3 gap-4 max-w-md mx-auto mb-8">
+            <div className="grid grid-cols-3 gap-4 max-w-xl  mx-auto mb-8">
               <div className="text-center bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50 dark:border-gray-700/50">
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{mockBlogPosts.length}</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Articles</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Số lượng bài viết</div>
               </div>
               <div className="text-center bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50 dark:border-gray-700/50">
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">6</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Categories</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Số lượng danh mục</div>
               </div>
               <div className="text-center bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 border border-gray-200/50 dark:border-gray-700/50">
                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">48</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Min Read</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Thời gian đọc</div>
               </div>
             </div>
           </div>
@@ -210,7 +257,7 @@ export default async function BlogListPage() {
                 <svg className="w-6 h-6 mr-2 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
-                Featured Article
+                Bài viết nổi bật
               </h2>
               
               <Link href={`/blogs/${mockBlogPosts[0].id}`} className="block group">
@@ -226,7 +273,7 @@ export default async function BlogListPage() {
                       <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                         <span className="font-medium">{new Date(mockBlogPosts[0].createdAt).toLocaleDateString('vi-VN')}</span>
                         <span className="mx-2">•</span>
-                        <span>{mockBlogPosts[0].readTime} min read</span>
+                        <span>{mockBlogPosts[0].readTime} phút đọc</span>
                       </div>
                     </div>
                     
@@ -272,7 +319,7 @@ export default async function BlogListPage() {
                 <svg className="w-6 h-6 mr-2 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
                 </svg>
-                All Articles
+                Tất cả bài viết
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -321,7 +368,7 @@ export default async function BlogListPage() {
                               <div className="flex items-center text-xs">
                                 <span>{new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
                                 <span className="mx-1">•</span>
-                                <span>{post.readTime} min</span>
+                                <span>{post.readTime} phút đọc</span>
                               </div>
                             </div>
                           </div>

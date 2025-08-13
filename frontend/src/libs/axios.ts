@@ -36,12 +36,12 @@ axiosInstance.interceptors.response.use(
   (error) => {
     // Xử lý lỗi 401 (Unauthorized) - token hết hạn hoặc không hợp lệ
     if (error.response?.status === 401) {
-      // Xóa token khỏi storage
-      localStorage.removeItem('authToken');
-      sessionStorage.removeItem('authToken');
-      
-      // Redirect về trang login (nếu cần)
+      // Xóa token khỏi storage (chỉ trên client side)
       if (typeof window !== 'undefined') {
+        localStorage.removeItem('authToken');
+        sessionStorage.removeItem('authToken');
+        
+        // Redirect về trang login
         window.location.href = '/login';
       }
     }
@@ -61,7 +61,6 @@ export const removeAuthToken = () => {
   sessionStorage.removeItem('authToken');
 };
 
-// Hàm helper để get token
 export const getAuthToken = (): string | null => {
   return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
 };

@@ -68,10 +68,59 @@ button:focus {
   outline: none;
 }
 
+a:focus {
+  outline: none;
+}
+
+input:focus {
+  outline: none;
+}
+
+/* Remove focus outline for all buttons, links, and inputs */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: none;
+}
+
 
 /* Smooth transitions */
 * {
   transition: all 0.2s ease-in-out;
+}
+
+/* Blog content styles */
+.blog-content {
+  user-select: text;
+  position: relative;
+  z-index: 10;
+}
+
+.blog-content p {
+  user-select: text;
+  line-height: 1.7;
+}
+
+/* Ensure modals are positioned correctly */
+.vocabulary-modal {
+  position: fixed;
+  z-index: 1000;
+}
+
+/* Prevent scrolling issues with modals */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Spacing for vocabulary panel */
+.main-content-with-vocabulary {
+  margin-right: 0;
+}
+
+@media (min-width: 1024px) {
+  .main-content-with-vocabulary {
+    margin-right: 20rem; /* Account for vocabulary panel width */
+  }
 }
 
 @layer components {

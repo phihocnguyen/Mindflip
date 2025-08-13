@@ -8,7 +8,7 @@ import SetSelector from '../writing/components/SetSelector';
 import ProgressBar from '../writing/components/ProgressBar';
 import ResultModal from '../writing/components/ResultModal';
 import { apiHelper } from '~/libs';
-import { generatePassage, VocabularyTerm, PassageResult } from '~/libs/gemini';
+import { generatePassage, VocabularyTerm, PassageResult } from '~/libs/openrouter';
 import { useAuthStore } from '~/hooks/authStore';
 
 interface FillInTheBlanksQuestion {

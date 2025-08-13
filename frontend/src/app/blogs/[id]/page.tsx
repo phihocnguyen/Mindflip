@@ -1,9 +1,12 @@
-import { redirect } from 'next/navigation';
-import SidebarWrapper from '../../dashboard/SidebarWrapper';
-import axiosInstance from '../../../libs/axios';
+'use client';
+
+import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import BlogVocabularyManager from '../components/BlogVocabularyManager';
 import ReactMarkdown from 'react-markdown';
+import { useAuthStore } from '../../../hooks/authStore';
+import axiosInstance from '../../../libs/axios';
 
 interface BlogPost {
   id: string;
@@ -113,28 +116,28 @@ Practice these phrases in mock meetings to build fluency and confidence.`,
 **Common Idioms Explained**
 
 1. **Break the ice** - To initiate conversation in a social setting
-   *Example: "He told a joke to break the ice at the meeting."*
+    *Example: "He told a joke to break the ice at the meeting."*
 
 2. **Bite the bullet** - To endure a painful or difficult situation
-   *Example: "I had to bite the bullet and tell my boss about the mistake."*
+    *Example: "I had to bite the bullet and tell my boss about the mistake."*
 
 3. **Spill the beans** - To reveal a secret
-   *Example: "She spilled the beans about the surprise party."*
+    *Example: "She spilled the beans about the surprise party."*
 
 4. **Hit the nail on the head** - To be exactly right
-   *Example: "You hit the nail on the head with that analysis."*
+    *Example: "You hit the nail on the head with that analysis."*
 
 5. **Under the weather** - Feeling sick
-   *Example: "I'm feeling under the weather today."*
+    *Example: "I'm feeling under the weather today."*
 
 6. **Piece of cake** - Something very easy
-   *Example: "The test was a piece of cake."*
+    *Example: "The test was a piece of cake."*
 
 7. **Let the cat out of the bag** - To accidentally reveal a secret
-   *Example: "He let the cat out of the bag about their engagement."*
+    *Example: "He let the cat out of the bag about their engagement."*
 
 8. **Burn the midnight oil** - To work late into the night
-   *Example: "I had to burn the midnight oil to finish the project."*
+    *Example: "I had to burn the midnight oil to finish the project."*
 
 **Tips for Learning Idioms**
 - Keep a journal of new idioms you encounter
@@ -210,20 +213,62 @@ async function fetchSidebarData(): Promise<Set[]> {
   }
 }
 
-export default async function BlogPostPage({ params }: { params: { id: string } }) {
-  const sets = await fetchSidebarData();
-  const post = mockBlogPosts.find(p => p.id === params.id);
-  if (!post) redirect('/blogs');
+export default function BlogPostPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+
+  const [sets, setSets] = useState<Set[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [vocabularyPanelOpen, setVocabularyPanelOpen] = useState(false);
+  const { isAuthenticated } = useAuthStore();
+  
+  const post = mockBlogPosts.find(p => p.id === resolvedParams.id);
+
+  if (!post) {
+    redirect('/blogs');
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedSets = await fetchSidebarData();
+        setSets(fetchedSets);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchData();
+    } else {
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  if (loading) {
+    return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">Đang tải...</div>;
+  }
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const toggleVocabularyPanel = () => {
+    setVocabularyPanelOpen(!vocabularyPanelOpen);
+  };
+
+  const closeVocabularyPanel = () => {
+    setVocabularyPanelOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Sidebar */}
-      <div className="hidden lg:block fixed top-0 left-0 h-full w-64 z-40">
-        <SidebarWrapper initialSets={sets} />
-      </div>
-
       {/* Main Content */}
-      <div className="lg:ml-64">
+      <div className="lg:ml-0">
         {/* Mobile Header */}
         <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 sticky top-0 z-30">
           <div className="flex items-center justify-between">
@@ -238,7 +283,14 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
             <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate max-w-xs">
               {post.title}
             </h1>
-            <div className="w-10"></div>
+            <button
+              onClick={toggleVocabularyPanel}
+              className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -253,7 +305,7 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              Back to Blog
+              Quay về
             </Link>
           </div>
 
@@ -269,10 +321,10 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
                       {post.category}
                     </span>
                     <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                      <span>{new Date(post.createdAt).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
+                      <span>{new Date(post.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
                       })}</span>
                       <span className="mx-2">•</span>
                       <span>{post.readTime} min read</span>
@@ -329,6 +381,7 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
                             {children}
                           </h3>
                         ),
+                        // ĐÂY LÀ CHỖ ĐÃ SỬA
                         strong: ({ children }) => (
                           <strong className="font-semibold text-gray-900 dark:text-gray-100">
                             {children}
@@ -355,8 +408,9 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
                           </li>
                         ),
                         a: ({ href, children }) => (
-                          <a 
-                            href={href} 
+                          // ĐÂY LÀ CHỖ ĐÃ SỬA
+                          <a
+                            href={href}
                             className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
                             target="_blank"
                             rel="noopener noreferrer"
@@ -412,17 +466,57 @@ export default async function BlogPostPage({ params }: { params: { id: string } 
               </article>
             </div>
 
-            {/* Sidebar - Vocabulary Manager */}
-            <aside className="xl:col-span-1">
+            {/* Sidebar - Vocabulary Manager - Always shown on desktop, hidden on mobile */}
+            <div className="hidden xl:block xl:col-span-1">
               <div className="sticky top-24">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-1">
+                <div className="">
                   <BlogVocabularyManager />
                 </div>
               </div>
-            </aside>
+            </div>
           </div>
         </main>
       </div>
+
+      {/* Vocabulary Panel for Mobile */}
+      {vocabularyPanelOpen && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          {/* Overlay */}
+          {/* ĐÂY LÀ CHỖ ĐÃ SỬA */}
+          <div
+            className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity"
+            onClick={closeVocabularyPanel}
+          ></div>
+
+          {/* Panel */}
+          <div className="fixed inset-y-0 right-0 max-w-full flex">
+            <div className="relative w-screen max-w-md">
+              <div className="h-full flex flex-col bg-white dark:bg-gray-800 shadow-xl">
+                <div className="flex-1 overflow-y-auto">
+                  <div className="px-4 py-6 sm:px-6">
+                    <div className="flex items-start justify-between">
+                      <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+                        Từ vựng
+                      </h2>
+                      <button
+                        onClick={closeVocabularyPanel}
+                        className="ml-3 h-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      >
+                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-6 relative flex-1 px-4 sm:px-6">
+                    <BlogVocabularyManager />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

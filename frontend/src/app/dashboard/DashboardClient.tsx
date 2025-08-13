@@ -9,6 +9,7 @@ import CalendarHeatmap from './components/CalendarHeatmap';
 import RecentSets from './components/RecentSets';
 import QuickActions from './components/QuickActions';
 import axiosInstance from '../../libs/axios';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 // Data interfaces
 interface Card {
@@ -53,10 +54,16 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
   const router = useRouter();
 
   useEffect(() => {
+    // Wait for auth store to initialize
+    if (isLoading) {
+      return;
+    }
+    
     if (!isAuthenticated) {
       router.push('/login');
       return;
     }
+    
     const fetchDashboardData = async () => {
       if (!token) return;
       
@@ -80,14 +87,10 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
 
   // Show loading state while checking auth or fetching data
   if (isLoading || loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-      </div>
-    );
+    return <LoadingSpinner isLoading={isLoading || loading} />;
   }
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated (and not still initializing)
   if (!isAuthenticated) {
     return null; // Will be redirected by useEffect
   }

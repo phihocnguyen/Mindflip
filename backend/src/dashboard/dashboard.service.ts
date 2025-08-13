@@ -66,7 +66,6 @@ export class DashboardService {
   private async _getTermStatusDistribution(userId: Types.ObjectId) {
       const sets = await this.setModel.find({ creatorId: userId });
       let learned = 0;
-      let learning = 0;
       let fresh = 0;
       sets.forEach(set => {
           set.terms.forEach(term => {
@@ -79,7 +78,6 @@ export class DashboardService {
       });
       return [
           { name: "Đã thuộc", value: learned },
-          { name: "Đang học", value: learning },
           { name: "Từ mới", value: fresh },
       ];
   }

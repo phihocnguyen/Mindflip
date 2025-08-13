@@ -1,7 +1,10 @@
-import { redirect } from 'next/navigation';
-import SidebarWrapper from './SidebarWrapper';
+'use client';
+
+import { useState, useEffect } from 'react';
+import Sidebar from '../../components/Sidebar';
 import DashboardClient from './DashboardClient';
 import axiosInstance from '../../libs/axios';
+import { useAuthStore } from '../../hooks/authStore';
 
 // Data interfaces
 interface Card {
@@ -56,9 +59,7 @@ async function fetchDashboardData(): Promise<DashboardData | null> {
     const response = await axiosInstance.get('/api/dashboard/overview');
     return response.data.data;
   } catch (error: any) {
-    // Handle 401 errors specifically
     if (error.response?.status === 401) {
-      // We'll handle redirect in the component
       console.log('Unauthorized access - token may be invalid');
       return null;
     }
@@ -67,15 +68,57 @@ async function fetchDashboardData(): Promise<DashboardData | null> {
   }
 }
 
-export default async function DashboardPage() {
-  const [sets, dashboardData] = await Promise.all([
-    fetchSidebarData(),
-    fetchDashboardData()
-  ]);
-  
+export default function DashboardPage() {
+  const [sets, setSets] = useState<Set[]>([]);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [fetchedSets, fetchedDashboardData] = await Promise.all([
+          fetchSidebarData(),
+          fetchDashboardData()
+        ]);
+        
+        setSets(fetchedSets);
+        setDashboardData(fetchedDashboardData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchData();
+    }
+  }, [isAuthenticated]);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  if (loading) {
+    return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">Đang tải...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <SidebarWrapper initialSets={sets} />
+      {/* Sidebar */}
+      <Sidebar
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        selectedFilter={selectedFilter}
+        setSelectedFilter={setSelectedFilter}
+        sets={sets}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
 
       {/* Main Content - Adjusted for fixed sidebar */}
       <div className="lg:ml-64">
@@ -83,6 +126,7 @@ export default async function DashboardPage() {
         <div className="lg:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
           <div className="flex items-center justify-between">
             <button
+              onClick={toggleSidebar}
               className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
