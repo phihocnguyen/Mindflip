@@ -1,156 +1,166 @@
-# Mindflip
+Mindflip
+========
 
-Mindflip is a modern vocabulary learning platform that helps users efficiently memorize and master new words through spaced repetition and interactive flashcards. Built with a Next.js 15 frontend and NestJS backend, the application provides a comprehensive learning experience with progress tracking and analytics.
+Mindflip là một nền tảng học từ vựng hiện đại giúp người dùng ghi nhớ và làm chủ từ mới hiệu quả thông qua phương pháp lặp lại ngắt quãng và flashcard tương tác. Ứng dụng được xây dựng với frontend Next.js 15 và backend NestJS, cung cấp trải nghiệm học tập toàn diện với tính năng theo dõi tiến trình và phân tích dữ liệu.
 
-## 🌟 Overview
+🌟 Tổng quan
+------------
 
-Mindflip is an intelligent vocabulary learning platform designed to help users efficiently memorize and master new words through evidence-based learning techniques. The application combines interactive flashcards with spaced repetition algorithms to optimize long-term retention while providing comprehensive progress tracking and analytics.
+Mindflip là nền tảng học từ vựng thông minh được thiết kế để giúp người dùng ghi nhớ và làm chủ từ mới hiệu quả dựa trên các kỹ thuật học tập khoa học. Ứng dụng kết hợp flashcard tương tác với thuật toán lặp lại ngắt quãng (SRS) nhằm tối ưu hóa khả năng ghi nhớ lâu dài, đồng thời cung cấp tính năng theo dõi tiến trình và phân tích toàn diện.
 
-With a clean, responsive interface and personalized learning paths, Mindflip makes vocabulary acquisition engaging and effective for learners of all levels.
+Với giao diện sạch sẽ, phản hồi nhanh và lộ trình học cá nhân hóa, Mindflip giúp việc học từ vựng trở nên hấp dẫn và hiệu quả cho mọi cấp độ người học.
 
-## 🏗️ Architecture
+🏗️ Kiến trúc
+-------------
 
-- **Frontend**: Next.js 15 with App Router, TypeScript, and Tailwind CSS
-- **Backend**: NestJS with modular architecture and MongoDB/Mongoose
-- **Authentication**: JWT-based authentication with Passport.js and Google OAuth
-- **API Communication**: RESTful API with Swagger documentation
-- **State Management**: Zustand for frontend state management
-- **Data Visualization**: Recharts for analytics and progress tracking
-- **Deployment**: Ready for deployment on Vercel (frontend) and cloud platforms (backend)
+*   **Frontend**: Next.js 15 với App Router, TypeScript, Tailwind CSS
+    
+*   **Backend**: NestJS với kiến trúc module và MongoDB/Mongoose
+    
+*   **Xác thực**: JWT-based authentication với Passport.js và Google OAuth
+    
+*   **Giao tiếp API**: RESTful API với tài liệu Swagger
+    
+*   **Quản lý trạng thái**: Zustand cho frontend state management
+    
+*   **Trực quan dữ liệu**: Recharts cho phân tích và theo dõi tiến trình
+    
+*   **Triển khai**: Sẵn sàng triển khai trên Vercel (frontend) và nền tảng cloud (backend)
+    
 
-## 🚀 Core Features
+🚀 Tính năng chính
+------------------
 
-### 📚 Vocabulary Management
-- **Create Custom Sets**: Build personalized vocabulary sets with terms and definitions
-- **Import/Export Functionality**: Easily import vocabulary from external sources or export your sets
-- **Public/Private Sharing**: Share your vocabulary sets with the community or keep them private
-- **Rich Media Support**: Add images, audio, and examples to enhance learning experience
+### 📚 Quản lý từ vựng
 
-### 🧠 Intelligent Learning System
-- **Spaced Repetition**: Advanced SRS algorithm optimizes review timing for long-term retention
-- **Adaptive Flashcards**: Interactive cards with flip animation and audio pronunciation
-- **Progressive Difficulty**: System adapts to your learning pace and proficiency level
-- **Multiple Learning Modes**: Study through flashcards, quizzes, matching games, and writing exercises
+*   **Tạo bộ từ vựng tùy chỉnh**: Tự xây dựng bộ từ vựng với thuật ngữ và định nghĩa
+    
+*   **Nhập/Xuất**: Dễ dàng nhập từ nguồn bên ngoài hoặc xuất bộ từ vựng
+    
+*   **Chia sẻ công khai/riêng tư**: Chia sẻ bộ từ vựng với cộng đồng hoặc giữ riêng
+    
+*   **Hỗ trợ đa phương tiện**: Thêm hình ảnh, âm thanh và ví dụ để nâng cao trải nghiệm
+    
 
-### 📊 Analytics & Insights
-- **Learning Dashboard**: Comprehensive overview of your study progress and achievements
-- **Activity Tracking**: Detailed statistics on study time, mastered terms, and learning patterns
-- **Performance Metrics**: Visual charts showing skill distribution and term mastery progress
-- **Heatmap Calendar**: Track your daily learning activity and maintain streaks
+### 🧠 Hệ thống học thông minh
 
-### 🔐 Authentication & Security
-- **Secure Login/Registration**: JWT-based authentication with encrypted password storage
-- **Google OAuth Integration**: One-click sign-in with Google account
-- **Email Verification**: Secure email confirmation for new accounts
-- **Session Management**: Automatic token refresh and secure session handling
+*   **Lặp lại ngắt quãng**: Thuật toán SRS tối ưu thời điểm ôn tập để ghi nhớ lâu dài
+    
+*   **Flashcard thích ứng**: Thẻ học tương tác với hiệu ứng lật và phát âm thanh
+    
+*   **Độ khó tiến triển**: Thích ứng với tốc độ và trình độ người học
+    
+*   **Nhiều chế độ học**: Flashcard, quiz, trò chơi ghép từ, bài tập viết
+    
 
-### 🎨 User Experience
-- **Responsive Design**: Fully optimized for desktop, tablet, and mobile devices
-- **Dark/Light Mode**: Toggle between color schemes based on preference
-- **Intuitive Navigation**: Clean interface with easy access to all features
-- **Keyboard Shortcuts**: Efficient navigation and interaction using keyboard controls
+### 📊 Phân tích & Thống kê
 
-## 📁 Project Structure
+*   **Bảng điều khiển học tập**: Tổng quan tiến trình học và thành tựu
+    
+*   **Theo dõi hoạt động**: Thống kê thời gian học, số từ đã làm chủ, thói quen học tập
+    
+*   **Chỉ số hiệu suất**: Biểu đồ thể hiện phân bố kỹ năng và tiến trình làm chủ từ vựng
+    
+*   **Lịch nhiệt (Heatmap)**: Theo dõi hoạt động học hàng ngày và streak
+    
 
-```
-mindflip/
-├── backend/                    # NestJS server application
-│   ├── src/                    # Backend source code
-│   │   ├── modules/            # Feature modules (auth, sets, users, etc.)
-│   │   ├── common/             # Shared utilities and interceptors
-│   │   ├── config/             # Configuration files
-│   │   └── main.ts             # Application entry point
-│   ├── package.json            # Backend dependencies
-│   └── ...
-└── frontend/                   # Next.js client application
-    ├── src/                    # Frontend source code
-    │   ├── app/                # App router pages and layouts
-    │   │   ├── dashboard/      # User dashboard with analytics
-    │   │   ├── sets/           # Vocabulary sets management
-    │   │   ├── login/          # Authentication pages
-    │   │   └── ...             # Other pages
-    │   ├── components/         # Reusable UI components
-    │   ├── hooks/              # Custom React hooks
-    │   ├── libs/               # Utility libraries and API clients
-    │   └── ...
-    ├── package.json            # Frontend dependencies
-    └── ...
-```
+### 🔐 Xác thực & Bảo mật
 
-## 🚀 Getting Started
+*   **Đăng nhập/Đăng ký an toàn**: JWT-based với mật khẩu được mã hóa
+    
+*   **Google OAuth**: Đăng nhập nhanh với tài khoản Google
+    
+*   **Xác minh email**: Bảo mật xác nhận email cho tài khoản mới
+    
+*   **Quản lý phiên**: Tự động làm mới token và xử lý phiên an toàn
+    
 
-### Prerequisites
-- Node.js (v18 or higher)
-- MongoDB instance (local or cloud)
-- npm or yarn package manager
+### 🎨 Trải nghiệm người dùng
 
-### Installation
+*   **Responsive**: Tối ưu cho desktop, tablet và mobile
+    
+*   **Chế độ tối/sáng**: Tuỳ chỉnh giao diện theo sở thích
+    
+*   **Điều hướng trực quan**: UI sạch sẽ, dễ sử dụng
+    
+*   **Phím tắt**: Điều hướng và thao tác nhanh bằng bàn phím
+    
 
-1. **Backend Setup**:
-```bash
-cd backend
-npm install
-# Configure environment variables in .env
-npm run start:dev
-```
+🚀 Bắt đầu
+----------
 
-2. **Frontend Setup**:
-```bash
-cd frontend
-npm install
-npm run dev
-```
+### Yêu cầu
 
-### Environment Variables
+*   Node.js (v18+)
+    
+*   MongoDB (local hoặc cloud)
+    
+*   npm hoặc yarn
 
-Create `.env` files in both `backend` and `frontend` directories with appropriate configuration values.
+### Biến môi trường
 
-## 🔐 Authentication Flow
+Tạo .env trong cả backend và frontend với cấu hình phù hợp.
 
-1. User registers via `/api/auth/register`
-2. Backend validates credentials and creates user with hashed password
-3. User logs in via `/api/auth/login`
-4. Backend generates JWT token upon successful authentication
-5. Frontend stores token and includes it in subsequent requests
-6. Backend validates token on protected routes
+🔐 Luồng xác thực
+-----------------
 
-## 🛠️ Technologies Used
+1.  Người dùng đăng ký qua /api/auth/register
+    
+2.  Backend xác thực và lưu người dùng với mật khẩu mã hóa
+    
+3.  Người dùng đăng nhập qua /api/auth/login
+    
+4.  Backend trả JWT token nếu thành công
+    
+5.  Frontend lưu token và gửi trong request tiếp theo
+    
+6.  Backend xác thực token với các route bảo vệ
+    
+
+🛠️ Công nghệ sử dụng
+---------------------
 
 ### Backend
-- **NestJS** - Progressive Node.js framework with modular architecture
-- **MongoDB/Mongoose** - NoSQL database and ODM for data persistence
-- **Passport.js** - Authentication middleware supporting multiple strategies
-- **JWT** - Token-based authentication and authorization
-- **bcrypt.js** - Secure password hashing and verification
-- **Swagger** - API documentation and testing interface
-- **Jest** - Unit and integration testing framework
-- **Class Validator** - Request payload validation and sanitization
+
+*   **NestJS** - Framework Node.js với kiến trúc module
+    
+*   **MongoDB/Mongoose** - Cơ sở dữ liệu NoSQL và ODM
+    
+*   **Passport.js** - Middleware xác thực đa chiến lược
+    
+*   **JWT** - Xác thực & phân quyền dựa trên token
+    
+*   **bcrypt.js** - Hash và kiểm tra mật khẩu
+    
+*   **Swagger** - Tài liệu API & giao diện test
+    
+*   **Jest** - Unit & integration testing
+    
+*   **Class Validator** - Xác thực & làm sạch dữ liệu
+    
 
 ### Frontend
-- **Next.js 15** - React framework with App Router and Server Components
-- **TypeScript** - Static typing for improved code quality and developer experience
-- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
-- **React Hooks** - State management and side effects handling
-- **Axios** - HTTP client for API communication
-- **Zustand** - Lightweight state management solution
-- **Lucide React** - Beautiful SVG icon components
-- **Recharts** - Declarative charting library built on D3
-- **React Markdown** - Markdown rendering component
 
-## 📱 Screenshots
+*   **Next.js 15** - Framework React với App Router
+    
+*   **TypeScript** - Kiểu tĩnh
+    
+*   **Tailwind CSS** - CSS tiện ích-first
+    
+*   **React Hooks** - State & effect
+    
+*   **Axios** - HTTP client
+    
+*   **Zustand** - State management nhẹ
+    
+*   **Lucide React** - Icon SVG
+    
+*   **Recharts** - Biểu đồ dựa trên D3
+    
+*   **React Markdown** - Render Markdown
+    
 
-*(Add screenshots of your application here)*
+📄 Giấy phép
+------------
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- [NestJS](https://nestjs.com/) - Backend framework
-- [Next.js](https://nextjs.org/) - Frontend framework
-- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
+Dự án được cấp phép theo MIT License - xem LICENSE để biết thêm.
