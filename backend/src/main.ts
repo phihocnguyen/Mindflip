@@ -1,4 +1,4 @@
-import { bootstrap } from "./boostrap";
+import { bootstrap } from "./bootstrap";
 
 async function start() {
   const app = await bootstrap();
