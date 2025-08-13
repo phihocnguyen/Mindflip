@@ -5,11 +5,32 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
-// Sample images for the slider (replace with actual image URLs or local assets)
 const sliderImages = [
-  { src: '/images/study1.jpg', alt: 'Interactive Flashcards', caption: 'Học từ vựng với Flashcard tương tác' },
-  { src: '/images/study2.jpg', alt: 'Spaced Repetition', caption: 'Ghi nhớ lâu hơn với Spaced Repetition' },
-  { src: '/images/study3.jpg', alt: 'Learning Blog', caption: 'Khám phá blog học tập phong phú' },
+  {
+    src: 'https://plus.unsplash.com/premium_photo-1705178701080-1e0eae873f7e?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    alt: 'Interactive Flashcards',
+    caption: 'Học từ vựng với Flashcard tương tác'
+  },
+  {
+    src: 'https://cdn.prod.website-files.com/60c39415644232ae43326cc1/61028dfdb2eceb4d7892a962_57724f71538787ba41c5d5a8daf43070.png',
+    alt: 'Spaced Repetition',
+    caption: 'Ghi nhớ lâu hơn với Spaced Repetition'
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1667669290669-aa37f48728ed?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    alt: 'Progress Tracking',
+    caption: 'Theo dõi tiến độ học tập của bạn'
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f',
+    alt: 'Learning Community',
+    caption: 'Kết nối với cộng đồng học tập'
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b',
+    alt: 'Personal Word Sets',
+    caption: 'Tạo bộ từ vựng cá nhân hóa'
+  }
 ];
 
 export default function HeroSection() {
@@ -21,7 +42,7 @@ export default function HeroSection() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % sliderImages.length);
-    }, 5000);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
@@ -50,9 +71,9 @@ export default function HeroSection() {
 
             {/* Subtitle */}
             <p className="text-xl sm:text-2xl max-w-xl mx-auto lg:mx-0 mb-12 text-gray-700 dark:text-gray-200 leading-relaxed animate-fade-in-up delay-200">
-            Khám phá nền tảng học từ vựng thông minh sử dụng{' '}
+            Nền tảng học từ vựng thông minh với{' '}
             <span className="font-semibold text-indigo-600 dark:text-indigo-400">Spaced Repetition</span>,
-            tích hợp flashcard tương tác, tra từ tức thì và blog học tập đầy cảm hứng.
+            flashcard tương tác, tra từ tức thì và theo dõi tiến độ học tập.
             </p>
 
             {/* CTA Buttons */}

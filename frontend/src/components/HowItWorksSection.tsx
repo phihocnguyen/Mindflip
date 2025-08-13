@@ -5,7 +5,7 @@ export default function HowItWorksSection() {
     {
       step: "01",
       title: "Tạo tài khoản",
-      description: "Đăng ký miễn phí và thiết lập mục tiêu học tập của bạn",
+      description: "Đăng ký miễn phí và bắt đầu hành trình học từ vựng của bạn",
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -16,7 +16,7 @@ export default function HowItWorksSection() {
     {
       step: "02", 
       title: "Chọn từ vựng",
-      description: "Thêm từ mới hoặc chọn từ bộ sưu tập có sẵn theo chủ đề",
+      description: "Thêm từ mới hoặc chọn từ các bộ sưu tập có sẵn",
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -37,11 +37,11 @@ export default function HowItWorksSection() {
     },
     {
       step: "04",
-      title: "Ôn tập thông minh", 
-      description: "Hệ thống tự động nhắc nhở ôn tập đúng thời điểm để ghi nhớ lâu dài",
+      title: "Theo dõi tiến độ", 
+      description: "Xem thống kê chi tiết về quá trình học và mức độ thành thạo",
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
       ),
       color: "from-orange-500 to-red-600"
@@ -61,7 +61,7 @@ export default function HowItWorksSection() {
           </h2>
           <div className="w-20 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 mx-auto mb-6 rounded-full"></div>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Quy trình học tập đơn giản và hiệu quả, được thiết kế dựa trên khoa học nhận thức
+            Quy trình học tập đơn giản và hiệu quả với công nghệ hiện đại
           </p>
         </div>
 
@@ -109,7 +109,7 @@ export default function HowItWorksSection() {
                 Xem Mindflip hoạt động
               </h3>
               <p className="text-xl text-gray-600 dark:text-gray-300">
-                Video demo 2 phút để hiểu rõ cách sử dụng platform
+                Video demo cách sử dụng các tính năng chính của Mindflip
               </p>
             </div>
             
@@ -127,7 +127,7 @@ export default function HowItWorksSection() {
               <div className="absolute inset-0 flex items-end p-8">
                 <div className="text-white">
                   <h4 className="text-2xl font-bold mb-2">Demo Mindflip</h4>
-                  <p className="text-indigo-100">Khám phá tính năng flashcard và space repetition</p>
+                  <p className="text-indigo-100">Khám phá các tính năng học từ vựng thông minh</p>
                 </div>
               </div>
             </div>

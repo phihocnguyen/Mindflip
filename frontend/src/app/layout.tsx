@@ -4,6 +4,8 @@ import "./globals.css";
 import Navigation from "../components/Navigation";
 import PageTransition from "../components/PageTransition";
 import AuthProvider from "../components/AuthProvider";
+import { useLoginModal } from "~/hooks/useLoginModal";
+import LoginModal from "../components/LoginModal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,6 +34,7 @@ export default function RootLayout({
             <Navigation />
             {children}
           </PageTransition>
+          <LoginModal />
         </AuthProvider>
       </body>
     </html>

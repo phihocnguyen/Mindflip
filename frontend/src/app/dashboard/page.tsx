@@ -5,6 +5,7 @@ import Sidebar from '../../components/Sidebar';
 import DashboardClient from './DashboardClient';
 import axiosInstance from '../../libs/axios';
 import { useAuthStore } from '../../hooks/authStore';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 // Data interfaces
 interface Card {
@@ -104,7 +105,7 @@ export default function DashboardPage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">Đang tải...</div>;
+    return <LoadingSpinner isLoading={loading} />;
   }
 
   return (

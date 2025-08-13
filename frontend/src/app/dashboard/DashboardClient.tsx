@@ -9,7 +9,6 @@ import CalendarHeatmap from './components/CalendarHeatmap';
 import RecentSets from './components/RecentSets';
 import QuickActions from './components/QuickActions';
 import axiosInstance from '../../libs/axios';
-import LoadingSpinner from '../../components/LoadingSpinner';
 
 // Data interfaces
 interface Card {
@@ -87,7 +86,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
 
   // Show loading state while checking auth or fetching data
   if (isLoading || loading) {
-    return <LoadingSpinner isLoading={isLoading || loading} />;
+    return <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">Đang tải...</div>;
   }
 
   // Redirect to login if not authenticated (and not still initializing)

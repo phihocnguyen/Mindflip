@@ -38,28 +38,6 @@ export default function FeaturesSection() {
     {
       icon: (
         <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-      ),
-      title: "Blog học tập",
-      description: "Thư viện bài viết phong phú về phương pháp học, mẹo ghi nhớ và kiến thức ngôn ngữ.",
-      gradient: "from-orange-500 to-red-600",
-      bgColor: "bg-orange-50 dark:bg-orange-900/20"
-    },
-    {
-      icon: (
-        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      ),
-      title: "Học nhanh & Hiệu quả",
-      description: "Tối ưu hóa thời gian học với thuật toán AI, giúp bạn nhớ lâu hơn với ít thời gian hơn.",
-      gradient: "from-cyan-500 to-blue-600",
-      bgColor: "bg-cyan-50 dark:bg-cyan-900/20"
-    },
-    {
-      icon: (
-        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
@@ -67,6 +45,28 @@ export default function FeaturesSection() {
       description: "Thống kê chi tiết về quá trình học, từ đã nhớ, cần ôn tập và mức độ thành thạo.",
       gradient: "from-teal-500 to-green-600",
       bgColor: "bg-teal-50 dark:bg-teal-900/20"
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      ),
+      title: "Bộ từ vựng cá nhân",
+      description: "Tạo và quản lý bộ từ vựng riêng theo chủ đề yêu thích, chia sẻ với bạn bè và cộng đồng.",
+      gradient: "from-orange-500 to-red-600",
+      bgColor: "bg-orange-50 dark:bg-orange-900/20"
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      ),
+      title: "Cộng đồng học tập",
+      description: "Kết nối với người học khác, chia sẻ bộ từ vựng, tham gia nhóm học và cùng tiến bộ.",
+      gradient: "from-cyan-500 to-blue-600",
+      bgColor: "bg-cyan-50 dark:bg-cyan-900/20"
     }
   ];
 
@@ -83,7 +83,7 @@ export default function FeaturesSection() {
           </h2>
           <div className="w-20 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 mx-auto mb-6 rounded-full"></div>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Khám phá những tính năng độc đáo giúp bạn học từ vựng hiệu quả và thú vị hơn bao giờ hết
+            Khám phá những tính năng toàn diện giúp bạn học từ vựng hiệu quả và ghi nhớ lâu hơn
           </p>
         </div>
 
@@ -126,13 +126,13 @@ export default function FeaturesSection() {
         <div className="mt-20 text-center">
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-12 text-white">
             <h3 className="text-3xl sm:text-4xl font-bold mb-6">
-              Sẵn sàng bắt đầu hành trình học tập?
+              Sẵn sàng chinh phục từ vựng hiệu quả?
             </h3>
             <p className="text-xl mb-8 text-indigo-100">
               Tham gia cùng hàng nghìn người đã cải thiện vốn từ vựng với Mindflip
             </p>
             <button className="inline-flex items-center px-8 py-4 bg-white text-indigo-600 font-bold text-lg rounded-xl hover:bg-gray-50 transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-xl">
-              Dùng thử miễn phí
+              Bắt đầu ngay
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5-5 5M6 12h12" />
               </svg>

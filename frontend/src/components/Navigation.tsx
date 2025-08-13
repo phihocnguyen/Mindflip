@@ -4,12 +4,14 @@ import Link from 'next/link';
 import { useAuthStore } from '../hooks/authStore';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useLoginModal } from '~/hooks/useLoginModal';
 
 export default function Navigation() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const logout = useAuthStore((state) => state.logout);
   const user = useAuthStore((state) => state.user);
   const initialize = useAuthStore((state) => state.initialize);
+  const { openLoginModal } = useLoginModal();
   
   // Luôn khởi tạo false để tránh hydration mismatch
   const [darkMode, setDarkMode] = useState(false);
@@ -82,10 +84,12 @@ export default function Navigation() {
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center overflow-hidden">
                     {user?.avatar ? (
-                      <img
+                      <Image
                         src={user.avatar}
-                        alt={user.name || user.email}
-                        className="w-8 h-8 rounded-full object-cover"
+                        alt={user.name || user.email || 'User Avatar'}
+                        width={32}
+                        height={32}
+                        className="rounded-full object-cover"
                       />
                     ) : (
                       <span className="text-white text-sm font-medium">
@@ -110,30 +114,15 @@ export default function Navigation() {
                 </button>
               </>
             ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="text-gray-700 dark:text-gray-200 hover:text-indigo-600 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                >
-                  <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                    </svg>
-                    Đăng nhập
-                  </span>
-                </Link>
-                <Link
-                  href="/register"
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                >
-                  <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                    </svg>
-                    Đăng ký
-                  </span>
-                </Link>
-              </>
+              <button
+                onClick={() => openLoginModal()}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+                Đăng nhập
+              </button>
             )}
           </div>
         </div>

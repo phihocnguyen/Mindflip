@@ -105,12 +105,13 @@ export default function RegisterFormClient() {
         </h2>
         <p className="text-body dark:text-gray-300">
           Hoặc{' '}
-          <Link 
-            href="/login" 
+          <button 
+            type="button"
+            onClick={() => router.push('/')}
             className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200"
           >
-            đăng nhập nếu đã có tài khoản
-          </Link>
+            quay về trang chủ
+          </button>
         </p>
       </div>
       <div className="card dark:bg-gray-900 dark:border-gray-800">
