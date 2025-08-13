@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import * as moment from 'moment-timezone';
+import moment from 'moment-timezone';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { Post, PostDocument } from '../posts/schemas/post.schema';
 import { StudyLog, StudyLogDocument } from 'src/study-logs/schemas/study-log.schema';
