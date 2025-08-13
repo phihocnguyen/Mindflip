@@ -44,7 +44,7 @@ export class AuthController {
       req.user.avatar
     );
     // Chuyển hướng về frontend với token
-    res.redirect(`https://mindflip-be.vercel.app/auth/callback?token=${access_token}`);
+    res.redirect(`https://mindflip-nu.vercel.app/auth/callback?token=${access_token}`);
   }
 
   @Get('profile')
