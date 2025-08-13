@@ -37,8 +37,8 @@ export default function LoadingSpinner({ isLoading, onLoadingComplete }: Loading
         <Image
           src="/my-logo.png"
           alt="Mindflip Logo"
-          width={400}
-          height={400}
+          width={200}
+          height={200}
           priority
         />
       </div>
