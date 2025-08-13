@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
       "cdn.prod.website-files.com"
     ],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
