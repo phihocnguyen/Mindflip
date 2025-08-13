@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, Query } from '@nestjs/common';
 import {PostsService} from './post.service';
-import {CommentsService} from 'src/comments/comment.service';
+import {CommentsService} from '../comments/comment.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CreatePostDto } from './dto/create-post.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { PostCategory } from './schemas/post.schema';
-import { CreateCommentDto } from 'src/comments/dto/create-comment.dto';
+import { CreateCommentDto } from '../comments/dto/create-comment.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Request } from 'express';
 import { PaginationDto } from './dto/pagination.dto';

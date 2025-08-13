@@ -4,7 +4,7 @@ import { Model, Types } from 'mongoose';
 import moment from 'moment-timezone';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { Post, PostDocument } from '../posts/schemas/post.schema';
-import { StudyLog, StudyLogDocument } from 'src/study-logs/schemas/study-log.schema';
+import { StudyLog, StudyLogDocument } from '../study-logs/schemas/study-log.schema';
 import { Level, LevelFilter, TimeRange } from './dto/leaderboard-query.dto';
 
 interface GetLeaderboardOptions {

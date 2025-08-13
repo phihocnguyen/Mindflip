@@ -5,7 +5,7 @@ import { UpdateSetDto } from './dto/update-set.dto';
 import { Request } from 'express';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { UpdateTermDto } from 'src/term/dto/update-term.dto';
+import { UpdateTermDto } from '../term/dto/update-term.dto';
 import { MatchGameDto } from './dto/match-game.dto';
 
 @ApiBearerAuth()

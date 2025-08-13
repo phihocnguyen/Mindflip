@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { DashboardService } from './dashboard.service';
 import { DashboardController } from './dashboard.controller';
 import { User, UserSchema } from '../users/schemas/user.schema';
-import { StudyLog, StudyLogSchema } from 'src/study-logs/schemas/study-log.schema';
+import { StudyLog, StudyLogSchema } from '../study-logs/schemas/study-log.schema';
 import { StudySet, StudySetSchema } from '../sets/schemas/set.schema';
 
 @Module({

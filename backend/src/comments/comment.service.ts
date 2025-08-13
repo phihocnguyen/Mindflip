@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Comment, CommentDocument } from './schemas/comment.schema';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { Post, PostDocument } from 'src/posts/schemas/post.schema';
-import { PaginationDto } from 'src/posts/dto/pagination.dto';
+import { Post, PostDocument } from '../posts/schemas/post.schema';
+import { PaginationDto } from '../posts/dto/pagination.dto';
 
 @Injectable()
 export class CommentsService {

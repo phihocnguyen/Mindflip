@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import moment from 'moment-timezone';
 import { User, UserDocument } from '../users/schemas/user.schema';
-import { StudyLog, StudyLogDocument } from 'src/study-logs/schemas/study-log.schema';
+import { StudyLog, StudyLogDocument } from '../study-logs/schemas/study-log.schema';
 import { StudySet, StudySetDocument } from '../sets/schemas/set.schema';
 
 @Injectable()

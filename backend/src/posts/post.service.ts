@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Post, PostCategory, PostDocument } from './schemas/post.schema';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Types } from 'mongoose';
-import { User, UserDocument } from 'src/users/schemas/user.schema';
+import { User, UserDocument } from '../users/schemas/user.schema';
 
 interface FindAllPostsOptions {
   category?: PostCategory;

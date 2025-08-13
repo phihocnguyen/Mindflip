@@ -4,7 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { CommentsService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { PaginationDto } from 'src/posts/dto/pagination.dto';
+import { PaginationDto } from '../posts/dto/pagination.dto';
 
 @ApiBearerAuth()
 @ApiTags('Community (Posts & Comments)')

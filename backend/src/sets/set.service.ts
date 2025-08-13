@@ -4,9 +4,9 @@ import { Model } from 'mongoose';
 import { StudySet, StudySetDocument } from './schemas/set.schema';
 import { CreateSetDto } from './dto/create-set.dto';
 import { UpdateSetDto } from './dto/update-set.dto';
-import { UpdateTermDto } from 'src/term/dto/update-term.dto';
-import { StudyLog, StudyLogDocument } from 'src/study-logs/schemas/study-log.schema';
-import { User, UserDocument } from 'src/users/schemas/user.schema';
+import { UpdateTermDto } from '../term/dto/update-term.dto';
+import { StudyLog, StudyLogDocument } from '../study-logs/schemas/study-log.schema';
+import { User, UserDocument } from '../users/schemas/user.schema';
 
 
 @Injectable()

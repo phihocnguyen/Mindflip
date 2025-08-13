@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsString, IsNotEmpty, IsArray, ValidateNested, IsOptional, IsBoolean } from 'class-validator';
-import { TermDto } from 'src/term/dto/term.dto';
+import { TermDto } from '../../term/dto/term.dto';
 
 export class CreateSetDto {
   @ApiProperty({ example: 'Bộ từ vựng 1', description: 'Tiêu đề của bộ từ vựng' })

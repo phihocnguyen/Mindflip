@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
-import { Term, TermSchema } from 'src/term/schemas/term.schema';
-import { User } from 'src/users/schemas/user.schema';
+import { Term, TermSchema } from '../../term/schemas/term.schema';
+import { User } from '../../users/schemas/user.schema';
 
 export type StudySetDocument = HydratedDocument<StudySet>;
 
