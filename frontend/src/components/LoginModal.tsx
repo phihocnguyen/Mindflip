@@ -266,7 +266,7 @@ export default function LoginModal() {
               className="w-full flex items-center justify-center gap-2 py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 transition-colors duration-200"
               onClick={() => {
                 closeLoginModal();
-                window.location.href = 'http://localhost:3333/api/auth/google';
+                window.location.href = 'https://mindflip-be.vercel.app/api/auth/google';
               }}
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 48 48">

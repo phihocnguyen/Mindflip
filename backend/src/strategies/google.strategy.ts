@@ -9,7 +9,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     super({
       clientID: configService.get<string>('GOOGLE_CLIENT_ID') as string,
       clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET') as string,
-      callbackURL: 'http://localhost:3333/api/auth/google/callback', // Phải khớp với controller
+      callbackURL: 'https://mindflip-be.vercel.app/api/auth/google/callback', // Phải khớp với controller
       scope: ['email', 'profile'],
     });
   }
