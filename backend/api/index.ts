@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { bootstrap } from 'src/boostrap';
+import { bootstrap } from '../src/bootstrap';
+
+
 
 export default async (req: VercelRequest, res: VercelResponse) => {
   const app = await bootstrap();
