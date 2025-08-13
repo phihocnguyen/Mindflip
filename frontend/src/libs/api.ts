@@ -235,7 +235,7 @@ export const authAPI = {
   // Login
   login: async (credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> => {
     try {
-      const response = await axiosInstance.post('/auth/login', credentials);
+      const response = await axiosInstance.post('/auth/', credentials);
       const apiResponse = response.data;
       
       if (apiResponse.statusCode >= 200 && apiResponse.statusCode < 300) {

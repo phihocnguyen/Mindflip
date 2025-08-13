@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useAuthStore } from '~/hooks/authStore';
+import { useAuthStore } from '~/hooks/useAuth';
 import Link from 'next/link';
 import axios from 'axios';
 import LoadingSpinner from '~/components/LoadingSpinner';
@@ -42,7 +42,7 @@ export default function StudySet() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push('/');
       return;
     }
 

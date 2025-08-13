@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import DashboardClient from './DashboardClient';
 import axiosInstance from '../../libs/axios';
-import { useAuthStore } from '../../hooks/authStore';
+import { useAuthStore } from '../../hooks/useAuth';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
 // Data interfaces
@@ -36,6 +36,7 @@ interface DashboardData {
   cardsPerSet: Array<{ name: string; 'Số thẻ': number }>;
   heatmapData: Array<{ date: string; count: number }>;
   recentSets: Array<{ _id: string; title: string }>;
+  mostStudiedSets: Array<{ name: string; count: number }>;
 }
 
 async function fetchSidebarData(): Promise<Set[]> {
@@ -150,7 +151,7 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <DashboardClient initialData={dashboardData as DashboardData} />
+          <DashboardClient initialData={dashboardData as any} />
         </div>
       </div>
     </div>

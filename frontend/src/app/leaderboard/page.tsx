@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Suspense } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Sidebar from '../../components/Sidebar';
 import LeaderboardTable from './components/LeaderboardTable';
 import LeaderboardStats from './components/LeaderboardStats';
 import LeaderboardFilters from './components/LeaderboardFilters';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { useAuthStore } from '~/hooks/authStore';
+import { useAuthStore } from '~/hooks/useAuth';
 import { axiosInstance } from '~/libs';
 
 interface Kpis {
@@ -36,6 +37,10 @@ interface FilterOptions {
 }
 
 export default function LeaderboardPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -45,12 +50,22 @@ export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<FilterOptions>({ timeRange: 'all', search: '', level: 'all' });
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   
   const { isAuthenticated } = useAuthStore();
+
+  // Initialize filters from URL parameters
+  const getInitialFilters = () => {
+    return {
+      timeRange: searchParams.get('timeRange') || 'all',
+      search: searchParams.get('search') || '',
+      level: searchParams.get('level') || 'all'
+    };
+  };
+
+  const [filters, setFilters] = useState<FilterOptions>(getInitialFilters());
 
   const fetchLeaderboard = useCallback(async (pageNum: number, currentFilters: FilterOptions, isNewFilter: boolean = false) => {
     if (pageNum === 1) setLoading(true);
@@ -84,22 +99,52 @@ export default function LeaderboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
-        fetchLeaderboard(1, filters, true);
+      // Get page from URL or default to 1
+      const pageParam = searchParams.get('page');
+      const page = pageParam ? parseInt(pageParam, 10) : 1;
+      setPage(page);
+      
+      // Get filters from URL
+      const urlFilters = getInitialFilters();
+      setFilters(urlFilters);
+      
+      fetchLeaderboard(page, urlFilters, true);
     }
-  }, [isAuthenticated, filters, fetchLeaderboard]);
+  }, [isAuthenticated, searchParams, fetchLeaderboard]);
 
   const handleFilterChange = (newFilters: FilterOptions) => {
     setPage(1);
     setFilters(newFilters);
+    
+    // Update URL with new filters
+    const params = new URLSearchParams();
+    if (newFilters.timeRange && newFilters.timeRange !== 'all') {
+      params.set('timeRange', newFilters.timeRange);
+    }
+    if (newFilters.search) {
+      params.set('search', newFilters.search);
+    }
+    if (newFilters.level && newFilters.level !== 'all') {
+      params.set('level', newFilters.level);
+    }
+    params.set('page', '1');
+    
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setPage(newPage);
+      
+      // Update URL with new page
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('page', newPage.toString());
+      
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
     }
   };
 

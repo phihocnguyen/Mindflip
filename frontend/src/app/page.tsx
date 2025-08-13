@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '../hooks/authStore';
+import { useAuthStore } from '../hooks/useAuth';
 import Link from 'next/link';
 import HeroSection from '../components/HeroSection';
 import FeaturesSection from '../components/FeaturesSection';

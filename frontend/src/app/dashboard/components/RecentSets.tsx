@@ -13,7 +13,7 @@ export default function RecentSets({ recentSets }: RecentSetsProps) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Bộ từ gần đây</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Bộ từ được tạo gần đây</h2>
         <Link
           href="/sets"
           className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"

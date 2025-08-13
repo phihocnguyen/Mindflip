@@ -80,7 +80,7 @@ export default function RegisterFormClient() {
       if (response.ok) {
         setSuccess('Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...');
         setTimeout(() => {
-          router.push('/login');
+          router.push('/');
         }, 2000);
       } else {
         setError(data.message || 'Đăng ký thất bại. Vui lòng thử lại.');

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useAuthStore } from '../../../../hooks/authStore';
+import { useAuthStore } from '../../../../hooks/useAuth';
 import Link from 'next/link';
 import { apiHelper } from '../../../../libs/api';
 import { Plus, X, ArrowLeft, Save, Eye, Trash2, BookOpen, Sparkles } from 'lucide-react';
@@ -41,7 +41,7 @@ export default function EditSet() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push('/');
       return;
     }
 

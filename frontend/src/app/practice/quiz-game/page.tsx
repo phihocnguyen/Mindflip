@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '../../../hooks/authStore';
+import { useAuthStore } from '../../../hooks/useAuth';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import Link from 'next/link';
 import { apiHelper } from '../../../libs/api';
@@ -67,7 +67,7 @@ export default function QuizGame() {
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push('/');
       return;
     }
     fetchSets();

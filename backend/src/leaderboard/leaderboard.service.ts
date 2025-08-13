@@ -5,7 +5,7 @@ import * as moment from 'moment-timezone';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { Post, PostDocument } from '../posts/schemas/post.schema';
 import { StudyLog, StudyLogDocument } from 'src/study-logs/schemas/study-log.schema';
-import { Level, TimeRange } from './dto/leaderboard-query.dto';
+import { Level, LevelFilter, TimeRange } from './dto/leaderboard-query.dto';
 
 interface GetLeaderboardOptions {
   userId: string;
@@ -13,7 +13,7 @@ interface GetLeaderboardOptions {
   limit: number;
   search?: string;
   timeRange?: TimeRange;
-  level?: string;
+  level?: LevelFilter;
 }
 
 @Injectable()
@@ -26,13 +26,13 @@ export class LeaderboardService {
     moment.tz.setDefault('Asia/Ho_Chi_Minh');
   }
 
-  private _getScoreRangeForLevel(level: Level) {
+  private _getScoreRangeForLevel(level: LevelFilter) {
     switch (level) {
-      case Level.MASTER: return { $gte: 9500 };
-      case Level.EXPERT: return { $gte: 9000, $lt: 9500 };
-      case Level.ADVANCED: return { $gte: 8500, $lt: 9000 };
-      case Level.INTERMEDIATE: return { $gte: 8000, $lt: 8500 };
-      case Level.BEGINNER: return { $lt: 8000 };
+      case LevelFilter.MASTER: return { $gte: 9500 };
+      case LevelFilter.EXPERT: return { $gte: 9000, $lt: 9500 };
+      case LevelFilter.ADVANCED: return { $gte: 8500, $lt: 9000 };
+      case LevelFilter.INTERMEDIATE: return { $gte: 8000, $lt: 8500 };
+      case LevelFilter.BEGINNER: return { $lt: 8000 };
       default: return null;
     }
   }
@@ -49,15 +49,45 @@ export class LeaderboardService {
   async getLeaderboard(options: GetLeaderboardOptions) {
     const { userId, page, limit, search, timeRange, level } = options;
 
-    if (timeRange !== 'all') {
-      return { kpis: null, currentUser: null, leaderboard: { data: [], page: 1, totalPages: 0 } };
+    const query: any = {};
+
+    // Xử lý search filter
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
     }
+    
+    // Xử lý level filter
+    if (level && level !== LevelFilter.ALL) {
+      const scoreRange = this._getScoreRangeForLevel(level);
+      if (scoreRange) {
+        query.score = scoreRange;
+      }
+    }
+    
+    // Xử lý timeRange filter
+    if (timeRange && timeRange !== 'all') {
+      const now = moment();
+      let startDate;
+      
+      if (timeRange === 'weekly') {
+        startDate = now.clone().startOf('week');
+      } else if (timeRange === 'monthly') {
+        startDate = now.clone().startOf('month');
+      } else if (timeRange === 'yearly') {
+        startDate = now.clone().startOf('year');
+      }
+      
+      if (startDate) {
+        query.createdAt = { $gte: startDate.toDate() };
+      }
+    }
+
     const currentUserPromise = this.userModel.findById(userId).select('score name avatar _id createdAt');
     const kpisPromise = Promise.all([
-      this.userModel.countDocuments(),
-      this.postModel.countDocuments(),
-      this.userModel.findOne().sort({ score: -1 }).select('score'),
-      this.userModel.aggregate([{ $group: { _id: null, avgScore: { $avg: '$score' } } }]),
+      this.userModel.countDocuments(), // Count tất cả users
+      this.postModel.countDocuments(), // Không thay đổi
+      this.userModel.findOne().sort({ score: -1 }).select('score'), // Không thay đổi
+      this.userModel.aggregate([{ $group: { _id: null, avgScore: { $avg: '$score' } } }]), // Không filter
     ]).then(([totalUsers, totalPosts, highestScoreUser, avgScoreResult]) => ({
       totalUsers,
       totalPosts,
@@ -71,32 +101,21 @@ export class LeaderboardService {
       throw new NotFoundException('Current user not found');
     }
 
-    const userRank = await this.userModel.countDocuments({
+    // Tính thứ hạng của người dùng trong toàn bộ danh sách (không filter)
+    const globalUserRank = await this.userModel.countDocuments({
       $or: [
         { score: { $gt: currentUser.score } },
         { score: currentUser.score, createdAt: { $lt: currentUser.createdAt } }
       ] 
     }) + 1;
-    const currentUserData = { rank: userRank, score: currentUser.score, user: currentUser };
+    const currentUserData = { rank: globalUserRank, score: currentUser.score, user: currentUser };
 
-    const query: any = {};
-
-    if (search) {
-      query.name = { $regex: search, $options: 'i' };
-    }
-    if (level && level !== 'all') {
-      const scoreRange = this._getScoreRangeForLevel(level as Level);
-      if (scoreRange) {
-        query.score = scoreRange;
-    }
-}
-    
     const [leaderboardData, total] = await Promise.all([
         this.userModel.find(query)
             .sort({ score: -1, createdAt: 1 })
             .skip((page - 1) * limit)
             .limit(limit)
-            .select('name avatar score')
+            .select('name avatar score createdAt')
             .exec(),
         this.userModel.countDocuments(query),
     ]);
@@ -125,5 +144,5 @@ export class LeaderboardService {
       currentUser: currentUserData,
       leaderboard: { data: finalLeaderboard, page, totalPages },
     };
-}
+  }
 }

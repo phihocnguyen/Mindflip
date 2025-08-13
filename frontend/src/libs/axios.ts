@@ -42,7 +42,7 @@ axiosInstance.interceptors.response.use(
         sessionStorage.removeItem('authToken');
         
         // Redirect về trang login
-        window.location.href = '/login';
+        window.location.href = '/';
       }
     }
     

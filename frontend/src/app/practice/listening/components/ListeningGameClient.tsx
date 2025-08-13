@@ -9,7 +9,7 @@ import ListeningQuestion from './ListeningQuestion';
 import ProgressBar from '../../writing/components/ProgressBar';
 import ResultModal from '../../writing/components/ResultModal';
 import { apiHelper } from '~/libs';
-import { useAuthStore } from '~/hooks/authStore';
+import { useAuthStore } from '~/hooks/useAuth';
 
 // --- INTERFACES ---
 interface VocabularyTerm {
@@ -51,7 +51,7 @@ export default function ListeningGameClient() {
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push('/');
       return;
     }
     fetchSets();

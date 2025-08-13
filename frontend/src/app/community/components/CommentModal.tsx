@@ -6,7 +6,7 @@ import { axiosInstance } from '~/libs';
 import TimeAgo from 'react-timeago';
 import viStrings from 'react-timeago/lib/language-strings/vi';
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';
-import {useAuthStore} from '~/hooks/authStore';
+import {useAuthStore} from '~/hooks/useAuth';
 import { Heart, MessageCircle } from 'lucide-react';
 import CommentItem from './CommentItem';
 const COMMENT_LIMIT = 5;

@@ -1,7 +1,7 @@
 'use client';
 
 import { Comment } from '../types';
-import { useAuthStore } from '~/hooks/authStore';
+import { useAuthStore } from '~/hooks/useAuth';
 import TimeAgo from 'react-timeago';
 import viStrings from 'react-timeago/lib/language-strings/vi';
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';

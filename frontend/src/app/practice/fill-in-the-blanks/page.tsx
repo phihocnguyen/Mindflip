@@ -9,7 +9,7 @@ import ProgressBar from '../writing/components/ProgressBar';
 import ResultModal from '../writing/components/ResultModal';
 import { apiHelper } from '~/libs';
 import { generatePassage, VocabularyTerm, PassageResult } from '~/libs/openrouter';
-import { useAuthStore } from '~/hooks/authStore';
+import { useAuthStore } from '~/hooks/useAuth';
 
 interface FillInTheBlanksQuestion {
   id: string;
@@ -25,6 +25,14 @@ interface Set {
   terms: VocabularyTerm[];
 }
 
+interface SessionLogData {
+  setId: string;
+  activityType: 'FILL';
+  durationSeconds: number;
+  correctAnswers: number;
+  totalItems: number;
+}
+
 export default function FillInTheBlanksPage() {
   const [questions, setQuestions] = useState<FillInTheBlanksQuestion[]>([]);
   const [score, setScore] = useState(0);
@@ -37,13 +45,14 @@ export default function FillInTheBlanksPage() {
   const [wordLimit, setWordLimit] = useState<number>(20);
   const [currentVocabulary, setCurrentVocabulary] = useState<VocabularyTerm[]>([]);
   const [quizStartTime, setQuizStartTime] = useState<number | null>(null);
+  const [sessionLogData, setSessionLogData] = useState<SessionLogData | null>(null);
   const { isAuthenticated, isLoading: authLoading } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push('/');
       return;
     }
     fetchSets();
@@ -53,7 +62,17 @@ export default function FillInTheBlanksPage() {
     if (questions.length > 0 && !quizCompleted) {
       setQuizStartTime(Date.now());
     }
-  }, [questions.length]);
+  }, [questions.length, quizCompleted]);
+
+  useEffect(() => {
+    const logSession = async () => {
+      if (sessionLogData) {
+        await apiHelper.post('/api/logs', sessionLogData);
+        setSessionLogData(null);
+      }
+    };
+    logSession();
+  }, [sessionLogData]);
 
   const fetchSets = async () => {
     try {
@@ -84,6 +103,7 @@ export default function FillInTheBlanksPage() {
   const fetchVocabulary = async (setId: string, limit: number) => {
     try {
       setLoading(true);
+      setError(null);
       const response = await apiHelper.get<VocabularyTerm[]>(`/api/sets/${setId}/random-terms?limit=${limit}`);
       if (response.success && response.data) {
         if (response.data.length < 1) {
@@ -116,11 +136,12 @@ export default function FillInTheBlanksPage() {
   const generatePassageWrapper = async (vocabulary: VocabularyTerm[]) => {
     try {
       setLoading(true);
+      setError(null);
       const result: PassageResult = await generatePassage(vocabulary);
       const newQuestion: FillInTheBlanksQuestion = {
         id: 'fib-1',
         passage: result.passage,
-        missingWords: result.missingWords.map((mw, idx) => ({
+        missingWords: result.missingWords.map((mw) => ({
           index: mw.index,
           term: mw.term,
           correctAnswer: mw.term,
@@ -129,7 +150,6 @@ export default function FillInTheBlanksPage() {
         userAnswers: new Array(result.missingWords.length).fill(''),
       };
       setQuestions([newQuestion]);
-      setError(null);
     } catch (error: any) {
       setError(error.message || 'Không thể tạo đoạn văn. Vui lòng thử lại.');
       setQuestions([]);
@@ -149,33 +169,36 @@ export default function FillInTheBlanksPage() {
     );
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     let correctCount = 0;
     let totalItems = 0;
     questions.forEach(q => {
       q.missingWords.forEach((mw, idx) => {
         totalItems++;
-        if (q.userAnswers[idx]?.toLowerCase() === mw.correctAnswer.toLowerCase()) {
+        if (q.userAnswers[idx]?.trim().toLowerCase() === mw.correctAnswer.toLowerCase()) {
           correctCount++;
         }
       });
     });
+
     setScore(correctCount);
-    setQuizCompleted(true);
 
     let durationSeconds = 0;
     if (quizStartTime) {
       durationSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
     }
+
     if (selectedSetId) {
-      await apiHelper.post('/api/logs', {
+      setSessionLogData({
         setId: selectedSetId,
         activityType: 'FILL',
         durationSeconds,
         correctAnswers: correctCount,
-        totalItems
+        totalItems,
       });
     }
+
+    setQuizCompleted(true);
   };
 
   const resetQuiz = () => {
@@ -217,20 +240,17 @@ export default function FillInTheBlanksPage() {
   const renderPassage = (question: FillInTheBlanksQuestion) => {
     const segments = question.passage.split('[BLANK]');
     let parts: (string | JSX.Element)[] = [];
-  
+
     segments.forEach((segment, i) => {
       parts.push(segment);
-  
+
       if (i < question.missingWords.length) {
         parts.push(
           <span
             key={`blank-${question.id}-${i}`}
             className="inline-flex items-center mx-2 my-1 align-middle"
           >
-            {/* Số thứ tự */}
             <span className="text-xs text-gray-400 mr-1">{i + 1}.</span>
-  
-            {/* Input */}
             <input
               type="text"
               value={question.userAnswers[i] || ''}
@@ -238,7 +258,7 @@ export default function FillInTheBlanksPage() {
               disabled={interactionsDisabled}
               className={`inline-block w-28 px-2 py-1 text-sm border rounded-lg align-middle focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 isInReviewMode
-                  ? question.userAnswers[i]?.toLowerCase() ===
+                  ? question.userAnswers[i]?.trim().toLowerCase() ===
                     question.missingWords[i].correctAnswer.toLowerCase()
                     ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                     : 'border-red-500 bg-red-50 dark:bg-red-900/20'
@@ -250,44 +270,32 @@ export default function FillInTheBlanksPage() {
         );
       }
     });
-  
+
     return (
-      <div className="mb-4 leading-relaxed">
+      <div className="mb-4 leading-relaxed text-justify">
         {parts}
-  
+
         {isInReviewMode && (
-          <div className="mt-2 ml-1 text-sm">
-            {question.missingWords.map((mw, idx) => (
-              <div key={idx}>
-                {question.userAnswers[idx] ? (
-                  question.userAnswers[idx].toLowerCase() ===
-                  mw.correctAnswer.toLowerCase() ? (
-                    <span className="text-green-600 dark:text-green-400">
-                      Từ {idx + 1}: Đúng
-                    </span>
-                  ) : (
-                    <span className="text-red-600 dark:text-red-400">
-                      Từ {idx + 1}: Sai, đáp án đúng: {mw.correctAnswer}
-                    </span>
-                  )
-                ) : (
-                  <span className="text-gray-500 dark:text-gray-400">
-                    Từ {idx + 1}: Chưa điền
-                  </span>
-                )}
-              </div>
-            ))}
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 text-sm">
+            <h4 className="font-semibold mb-2">Đáp án:</h4>
+            {question.missingWords.map((mw, idx) => {
+              const isCorrect = question.userAnswers[idx]?.trim().toLowerCase() === mw.correctAnswer.toLowerCase();
+              return (
+                <div key={idx} className={`flex items-center ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  <span className="font-medium w-16">Từ {idx + 1}:</span>
+                  <span>{isCorrect ? 'Đúng' : `Sai, đáp án đúng là "${mw.correctAnswer}"`}</span>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
     );
   };
-  
-  
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-200">
-      {loading && (
+      {(loading || authLoading) && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
           <LoadingSpinner isLoading={true} />
         </div>
@@ -339,21 +347,21 @@ export default function FillInTheBlanksPage() {
           <h2 className="text-lg font-medium text-center">Điền từ vựng vào chỗ trống</h2>
 
           {error && (
-            <div className="text-center py-4 text-red-600 dark:text-red-400">{error}</div>
+            <div className="text-center py-4 px-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg">{error}</div>
           )}
 
-          {questions.length > 0 ? (
+          {!loading && !error && questions.length > 0 ? (
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
               <h3 className="text-xl font-semibold mb-4">Bài tập điền chỗ trống</h3>
               <div className="space-y-4">
-                {questions.map((q, index) => (
+                {questions.map((q) => (
                   <div key={q.id}>{renderPassage(q)}</div>
                 ))}
               </div>
             </div>
-          ) : (
+          ) : !loading && (
             <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-              {sets.length === 0 ? "Bạn chưa có bộ từ vựng nào." : "Bộ từ vựng này không đủ từ để tạo bài tập."}
+              {sets.length === 0 ? "Bạn chưa có bộ từ vựng nào." : "Chọn một bộ từ vựng để bắt đầu."}
             </div>
           )}
 
@@ -361,9 +369,9 @@ export default function FillInTheBlanksPage() {
             {!isInReviewMode && questions.length > 0 && (
               <button
                 onClick={handleSubmit}
-                disabled={!allAnswered}
+                disabled={!allAnswered || loading}
                 className={`px-6 py-2 rounded-lg text-base font-medium transition-all duration-200 ${
-                  allAnswered
+                  allAnswered && !loading
                     ? 'bg-green-600 hover:bg-green-700 text-white shadow-sm'
                     : 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed text-gray-600 dark:text-gray-400'
                 }`}

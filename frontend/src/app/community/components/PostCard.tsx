@@ -1,6 +1,6 @@
 'use client';
 import { Post } from '../types';
-import { useAuthStore } from '~/hooks/authStore';
+import { useAuthStore } from '~/hooks/useAuth';
 import { Heart, MessageCircle, Share2 } from 'lucide-react';
 import TimeAgo from 'react-timeago';
 import viStrings from 'react-timeago/lib/language-strings/vi';

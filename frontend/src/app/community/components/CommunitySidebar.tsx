@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '../../../hooks/authStore';
+import { useAuthStore } from '../../../hooks/useAuth';
 import { axiosInstance } from '~/libs';
 import Link from 'next/link';
 

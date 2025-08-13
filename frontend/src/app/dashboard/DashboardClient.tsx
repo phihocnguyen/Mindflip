@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '../../hooks/authStore';
+import { useAuthStore } from '../../hooks/useAuth';
 import StatsCards from './components/StatsCards';
 import ChartsSection from './components/ChartsSection';
 import CalendarHeatmap from './components/CalendarHeatmap';
@@ -39,6 +39,7 @@ interface DashboardData {
   cardsPerSet: Array<{ name: string; 'Số thẻ': number }>;
   heatmapData: Array<{ date: string; count: number }>;
   recentSets: Array<{ _id: string; title: string }>;
+  mostStudiedSets: Array<{ name: string; count: number }>;
 }
 
 interface DashboardClientProps {
@@ -59,7 +60,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
     }
     
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push('/');
       return;
     }
     
@@ -139,12 +140,27 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
     }],
   };
   
-  // New chart for skill distribution
+  const activityTypeVietnamese = {
+    MATCHING: "Game nối từ",
+    QUIZ: "Quiz tổng hợp",
+    WRITING: "Luyện viết",
+    LISTENING: "Luyện nghe",
+    SPEAKING: "Luyện nói",
+    FILL: "Điền vào chỗ trống",
+  };
+
+  const excludedTypes = ['TERM_LEARNED', 'SET_COMPLETED'];
+
+  type ActivityType = keyof typeof activityTypeVietnamese;
+
+  const filteredSkillDistribution = skillDistribution.filter(
+    (skill) => !excludedTypes.includes(skill.name)
+  );
   const skillDistributionData = {
-    labels: skillDistribution.map((skill: any) => skill.name),
+    labels: filteredSkillDistribution.map((skill) => activityTypeVietnamese[skill.name as ActivityType] || skill.name),
     datasets: [{
-      label: 'Số lần luyện tập',
-      data: skillDistribution.map((skill: any) => skill.value),
+      label: 'Số giây luyện tập',
+      data: filteredSkillDistribution.map((skill: any) => skill.value),
       backgroundColor: [
         '#4F46E5',
         '#10B981',
@@ -165,22 +181,32 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
     }],
   };
   
-  // Chart for most reviewed cards (using cardsPerSet data)
+    // Chart for most reviewed cards (using mostStudiedSets data)
   const mostReviewedCardsData = {
-    labels: cardsPerSet.slice(0, 5).map((set: any) => 
+    labels: (dashboardData.mostStudiedSets || []).map((set: any) => 
       set.name.length > 20 ? set.name.slice(0, 20) + '...' : set.name
     ),
     datasets: [{
-      label: 'Số thẻ',
-      data: cardsPerSet.slice(0, 5).map((set: any) => set['Số thẻ']),
+      label: 'Số lần ôn tập',
+      data: (dashboardData.mostStudiedSets || []).map((set: any) => set.count),
       backgroundColor: '#4F46E5',
       borderColor: '#4F46E5',
       borderWidth: 1,
     }],
   };
   
+  const statusNameMapping: Record<string, string> = {
+    MATCHING: "Game nối từ",
+    QUIZ: "Quiz tổng hợp",
+    WRITING: "Luyện viết",
+    LISTENING: "Luyện nghe",
+    SPEAKING: "Luyện nói",
+    FILL: "Điền vào chỗ trống",
+    TERM_LEARNED: "Học từ mới"
+  };
+
   const doughnutData = {
-    labels: termStatusDistribution.map((status: any) => status.name),
+    labels: termStatusDistribution.map((status: any) => statusNameMapping[status.name] || status.name),
     datasets: [{
       data: termStatusDistribution.map((status: any) => status.value),
       backgroundColor: ['#10B981', '#3B82F6', '#EF4444', '#F59E0B'],

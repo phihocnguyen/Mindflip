@@ -8,7 +8,7 @@ import { formatDistanceToNow, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import axiosInstance from '../../../libs/axios';
 import Sidebar from '../../../components/Sidebar';
-import { useAuthStore } from '../../../hooks/authStore';
+import { useAuthStore } from '../../../hooks/useAuth';
 import CommentModal from '~/app/community/components/CommentModal';
 
 // Data interfaces

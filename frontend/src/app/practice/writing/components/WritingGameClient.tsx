@@ -9,7 +9,7 @@ import WritingQuestion from './WritingQuestion';
 import ProgressBar from './ProgressBar';
 import ResultModal from './ResultModal';
 import { apiHelper } from '~/libs';
-import { useAuthStore } from '~/hooks/authStore';
+import { useAuthStore } from '~/hooks/useAuth';
 
 // --- INTERFACES ---
 interface VocabularyTerm {
@@ -49,7 +49,7 @@ export default function WritingGameClient() {
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push('/');
       return;
     }
     fetchSets();

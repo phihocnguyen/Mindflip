@@ -66,7 +66,7 @@ npm run dev
 ```
 
 ### Đăng nhập
-- **URL**: `/api/auth/login`
+- **URL**: `/api/auth/`
 - **Method**: `POST`
 - **Body**:
 ```json
@@ -80,7 +80,7 @@ npm run dev
 
 Đảm bảo backend NestJS đang chạy trên port 3000 và có các endpoints:
 - `POST /api/auth/register`
-- `POST /api/auth/login`
+- `POST /api/auth/`
 
 ## Tính năng bảo mật
 
@@ -109,7 +109,7 @@ Dự án đã được tối ưu hóa với chỉ những dependencies cần thi
 ## Hướng dẫn sử dụng
 
 1. **Đăng ký**: Truy cập `/register` để tạo tài khoản mới
-2. **Đăng nhập**: Truy cập `/login` để đăng nhập
+2. **Đăng nhập**: Truy cập `/` để đăng nhập
 3. **Navigation**: Sử dụng navigation bar để điều hướng
 4. **Đăng xuất**: Nhấn nút "Đăng xuất" trong navigation
 

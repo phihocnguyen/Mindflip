@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore } from '../hooks/authStore';
+import { useAuthStore } from '../hooks/useAuth';
 import { useLoginModal } from '../hooks/useLoginModal';
 
 interface LoginFormData {
@@ -98,7 +98,7 @@ export default function LoginModal() {
     setError('');
     setSuccess('');
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/auth/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

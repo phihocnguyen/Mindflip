@@ -142,27 +142,6 @@ export default function TestimonialsSection() {
             <div className="text-gray-600 dark:text-gray-300 font-medium">Đánh giá trung bình</div>
           </div>
         </div>
-
-        {/* Social Proof */}
-        <div className="text-center">
-          <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-            Được tin dùng bởi sinh viên, chuyên gia và giảng viên tại:
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
-            <div className="px-6 py-3 bg-gray-100 dark:bg-gray-800 rounded-lg font-semibold text-gray-700 dark:text-gray-300">
-              Đại học Bách Khoa
-            </div>
-            <div className="px-6 py-3 bg-gray-100 dark:bg-gray-800 rounded-lg font-semibold text-gray-700 dark:text-gray-300">
-              FPT University
-            </div>
-            <div className="px-6 py-3 bg-gray-100 dark:bg-gray-800 rounded-lg font-semibold text-gray-700 dark:text-gray-300">
-              VinGroup
-            </div>
-            <div className="px-6 py-3 bg-gray-100 dark:bg-gray-800 rounded-lg font-semibold text-gray-700 dark:text-gray-300">
-              Tiki
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

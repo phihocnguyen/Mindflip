@@ -6,7 +6,7 @@ import CommunityHeader from './components/CommunityHeader';
 import CommunityPosts from './components/CommunityPosts';
 import CommunitySidebar from './components/CommunitySidebar';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { useAuthStore } from '~/hooks/authStore';
+import { useAuthStore } from '~/hooks/useAuth';
 import { Post } from './types';
 import { axiosInstance } from '~/libs';
 import CommentModal from './components/CommentModal';

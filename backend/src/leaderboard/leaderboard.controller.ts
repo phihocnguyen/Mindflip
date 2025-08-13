@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { LeaderboardService } from './leaderboard.service';
 import { LeaderboardQueryDto } from './dto/leaderboard-query.dto';
+import { LevelFilter, TimeRange } from './dto/leaderboard-query.dto';
 
 
 @ApiBearerAuth()

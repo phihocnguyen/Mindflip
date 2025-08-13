@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuthStore } from "../../../hooks/authStore";
+import { useAuthStore } from "../../../hooks/useAuth";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function AuthCallbackPage() {
       router.replace("/dashboard");
     } else {
       // Nếu không có token, chuyển về trang đăng nhập
-      router.replace("/login");
+      router.replace("/");
     }
   }, [searchParams, login, router]);
 

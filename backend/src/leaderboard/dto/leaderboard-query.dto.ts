@@ -6,9 +6,19 @@ export enum TimeRange {
   ALL = 'all',
   WEEKLY = 'weekly',
   MONTHLY = 'monthly',
+  YEARLY = 'yearly',
 }
 
 export enum Level {
+  MASTER = 'Master',
+  EXPERT = 'Expert',
+  ADVANCED = 'Advanced',
+  INTERMEDIATE = 'Intermediate',
+  BEGINNER = 'Beginner',
+}
+
+export enum LevelFilter {
+  ALL = 'all',
   MASTER = 'Master',
   EXPERT = 'Expert',
   ADVANCED = 'Advanced',
@@ -33,7 +43,7 @@ export class LeaderboardQueryDto {
   @IsEnum(TimeRange) @IsOptional()
   timeRange?: TimeRange = TimeRange.ALL;
 
-  @IsString()
-  @IsOptional()
-  level?: string;
+  @ApiPropertyOptional({ enum: LevelFilter, default: LevelFilter.ALL })
+  @IsEnum(LevelFilter) @IsOptional()
+  level?: LevelFilter;
 }

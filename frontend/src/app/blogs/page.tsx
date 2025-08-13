@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import Link from 'next/link';
-import { useAuthStore } from '../../hooks/authStore';
+import { useAuthStore } from '../../hooks/useAuth';
 import axiosInstance from '../../libs/axios';
 
 interface BlogPost {

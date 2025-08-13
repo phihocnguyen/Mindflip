@@ -118,9 +118,9 @@ export default function ChartsSection({ pieData, barData, skillDistributionData,
         </div>
       </div>
 
-      {/* Bar Chart - Most Reviewed Cards */}
+      {/* Bar Chart - Most Reviewed Sets */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Số thẻ được ôn tập nhiều nhất</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Bộ từ vựng được ôn tập nhiều nhất</h2>
         <div className="h-64">
           <Bar
             data={mostReviewedCardsData}

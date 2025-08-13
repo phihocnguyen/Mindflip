@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    const response = await apiHelper.post('/auth/login', body);
+    const response = await apiHelper.post('/auth/', body);
     
     if (response.success) {
       return NextResponse.json(response.data, { status: 200 });

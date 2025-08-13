@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useAuthStore } from '../hooks/authStore';
+import { useAuthStore } from '../hooks/useAuth';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useLoginModal } from '~/hooks/useLoginModal';

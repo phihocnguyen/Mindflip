@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface LeaderboardFiltersProps {
   onFilterChange: (filters: FilterOptions) => void;
@@ -12,10 +12,14 @@ interface FilterOptions {
   level: string;
 }
 
-
-
 export default function LeaderboardFilters({ onFilterChange }: LeaderboardFiltersProps) {
   const [filters, setFilters] = useState<FilterOptions>({ 
+    timeRange: 'all', 
+    search: '',
+    level: 'all' 
+  });
+  
+  const [appliedFilters, setAppliedFilters] = useState<FilterOptions>({ 
     timeRange: 'all', 
     search: '',
     level: 'all' 
@@ -23,18 +27,21 @@ export default function LeaderboardFilters({ onFilterChange }: LeaderboardFilter
 
   const LEVELS = ['Master', 'Expert', 'Advanced', 'Intermediate', 'Beginner'];
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      onFilterChange(filters);
-    }, 500);
-
-    return () => clearTimeout(handler);
-  }, [filters, onFilterChange]);
-
   const handleFilterChange = (key: keyof FilterOptions, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
-
+  
+  const handleApplyFilters = () => {
+    setAppliedFilters(filters);
+    onFilterChange(filters);
+  };
+  
+  const handleResetFilters = () => {
+    const resetFilters = { timeRange: 'all', search: '', level: 'all' };
+    setFilters(resetFilters);
+    setAppliedFilters(resetFilters);
+    onFilterChange(resetFilters);
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
@@ -54,9 +61,9 @@ export default function LeaderboardFilters({ onFilterChange }: LeaderboardFilter
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="all">Tất cả thời gian</option>
-            <option value="week">Tuần này</option>
-            <option value="month">Tháng này</option>
-            <option value="year">Năm nay</option>
+            <option value="weekly">Tuần này</option>
+            <option value="monthly">Tháng này</option>
+            <option value="yearly">Năm nay</option>
           </select>
         </div>
 
@@ -80,6 +87,7 @@ export default function LeaderboardFilters({ onFilterChange }: LeaderboardFilter
             />
           </div>
         </div>
+        
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Cấp độ
@@ -87,7 +95,7 @@ export default function LeaderboardFilters({ onFilterChange }: LeaderboardFilter
           <select
             value={filters.level}
             onChange={(e) => handleFilterChange('level', e.target.value)}
-            className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white ..."
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="all">Tất cả cấp độ</option>
             {LEVELS.map(level => (
@@ -96,6 +104,21 @@ export default function LeaderboardFilters({ onFilterChange }: LeaderboardFilter
           </select>
         </div>
       </div>
+      
+      <div className="flex justify-end space-x-3 mt-6">
+        <button
+          onClick={handleResetFilters}
+          className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+        >
+          Đặt lại
+        </button>
+        <button
+          onClick={handleApplyFilters}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+        >
+          Áp dụng bộ lọc
+        </button>
+      </div>
     </div>
   );
-} 
+}

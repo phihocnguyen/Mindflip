@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import BlogVocabularyManager from '../components/BlogVocabularyManager';
 import ReactMarkdown from 'react-markdown';
-import { useAuthStore } from '../../../hooks/authStore';
+import { useAuthStore } from '../../../hooks/useAuth';
 import axiosInstance from '../../../libs/axios';
 
 interface BlogPost {

@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useAuthStore } from '~/hooks/authStore';
+import { useAuthStore } from '~/hooks/useAuth';
 
 interface ReplyFormProps {
   onSubmit: (content: string) => Promise<void>;
