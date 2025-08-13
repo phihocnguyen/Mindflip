@@ -2,6 +2,7 @@
 import TimeAgo from 'react-timeago';
 import viStrings from 'react-timeago/lib/language-strings/vi';
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';
+import Link from 'next/link';
 
 const formatter = buildFormatter(viStrings);
 export interface LeaderboardEntry {
@@ -145,9 +146,9 @@ export default function LeaderboardTable({ leaderboardData, loading, currentPage
                       )}
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">
+                      <Link href={`/user/${entry._id}`} className="font-medium text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                         {entry.name}
-                      </p>
+                      </Link>
                     </div>
                   </div>
                 </td>

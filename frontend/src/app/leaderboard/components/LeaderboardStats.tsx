@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 
 interface LeaderboardStats {
   totalUsers: number;
@@ -88,9 +89,9 @@ export default function LeaderboardStats({ kpis, currentUser, loading }: Leaderb
       <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+            <Link href={`/user/${currentUser.user._id}`} className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold hover:opacity-80 transition-opacity">
               {currentUser.user.avatar ? <img src={currentUser.user.avatar} alt={currentUser.user.name} className="w-12 h-12 rounded-full object-cover" /> : currentUser.user.name.charAt(0).toUpperCase()}
-            </div>
+            </Link>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">Thứ hạng của bạn</p>
               <p className="text-lg font-bold text-gray-900 dark:text-white">

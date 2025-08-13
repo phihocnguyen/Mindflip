@@ -60,10 +60,20 @@ export default function CommentItem({ comment, onLike, onReplySubmit,onReplyClic
 
   return (
     <div className="flex items-start space-x-3 mt-2">
-      <div className="w-8 h-8 bg-gray-400 dark:bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-        <span className="text-white text-xs font-medium">
-          {comment.author?.name?.charAt(0).toUpperCase() || '?'}
-        </span>
+      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+        {comment.author?.avatar ? (
+          <img 
+            src={comment.author.avatar} 
+            alt={comment.author.name} 
+            className="w-8 h-8 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-8 h-8 bg-gray-400 dark:bg-gray-600 rounded-full flex items-center justify-center">
+            <span className="text-white text-xs font-medium">
+              {comment.author?.name?.charAt(0).toUpperCase() || '?'}
+            </span>
+          </div>
+        )}
       </div>
       <div className="flex-1">
         <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl px-3 py-2 inline-block">

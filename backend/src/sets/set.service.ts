@@ -35,7 +35,7 @@ export class SetsService {
       throw new NotFoundException(`Bộ từ với ID "${id}" không tồn tại.`);
     }
     // Chỉ chủ sở hữu mới có quyền xem chi tiết (có thể thay đổi tùy logic)
-    if (studySet.creatorId.toString() != userId) {
+    if (!studySet.isPublic &&  studySet.creatorId.toString() != userId) {
       throw new ForbiddenException('Bạn không có quyền truy cập vào tài nguyên này.');
     }
     return studySet;

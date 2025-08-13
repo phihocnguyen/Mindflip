@@ -14,6 +14,10 @@ export type PostDocument = HydratedDocument<Post>;
 
 @Schema({ timestamps: true })
 export class Post {
+
+  @Prop({ required: true })
+  title: string;
+
   @Prop({ required: true })
   content: string;
 

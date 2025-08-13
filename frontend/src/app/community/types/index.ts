@@ -21,6 +21,7 @@ export interface Comment {
 export interface Post {
   _id: string;
   author: Author | null;
+  title: string;
   content: string;
   category: string;
   likes: string[];

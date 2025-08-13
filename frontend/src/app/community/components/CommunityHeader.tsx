@@ -26,6 +26,7 @@ const CATEGORIES = [
 
 export default function CommunityHeader({ onPostCreated }: CommunityHeaderProps) {
   const [showCreatePost, setShowCreatePost] = useState(false);
+  const [postTitle, setPostTitle] = useState('');
   const [postContent, setPostContent] = useState('');
   const [postCategory, setPostCategory] = useState(CATEGORIES[0]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,17 +52,19 @@ export default function CommunityHeader({ onPostCreated }: CommunityHeaderProps)
   }, []);
 
   const handleCreatePost = async () => {
-    if (!postContent.trim() || isSubmitting) return;
+    if (!postTitle.trim() || !postContent.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
     try {
       const res = await axiosInstance.post('/api/posts', {
+        title: postTitle,
         content: postContent,
         category: postCategory,
       });
       let newPost = {}
       if (res.status === 201) {
         newPost = res.data.data;
+        setPostTitle('');
         setPostContent('');
         setPostCategory(CATEGORIES[0]);
         setShowCreatePost(false);
@@ -163,6 +166,19 @@ export default function CommunityHeader({ onPostCreated }: CommunityHeaderProps)
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Tiêu đề
+                </label>
+                <input
+                  type="text"
+                  value={postTitle}
+                  onChange={(e) => setPostTitle(e.target.value)}
+                  placeholder="Nhập tiêu đề bài viết..."
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Nội dung
                 </label>
                 <textarea
@@ -183,7 +199,7 @@ export default function CommunityHeader({ onPostCreated }: CommunityHeaderProps)
                 </button>
                 <button
                   onClick={handleCreatePost}
-                  disabled={!postContent.trim()}
+                  disabled={!postTitle.trim() || !postContent.trim()}
                   className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Đăng bài

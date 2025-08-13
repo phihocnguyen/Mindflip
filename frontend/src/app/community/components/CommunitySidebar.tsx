@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../../../hooks/authStore';
 import { axiosInstance } from '~/libs';
+import Link from 'next/link';
 
 interface TopUser {
   _id: string;
@@ -13,6 +14,7 @@ interface TopUser {
 
 interface TopPost {
   _id: string;
+  title: string;
   content: string;
   category: string;
   interactionScore: number;
@@ -123,9 +125,9 @@ export default function CommunitySidebar({ onTopicClick }: CommunitySidebarProps
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <Link href={`/user/${user._id}`} className="text-sm font-medium text-gray-900 dark:text-white truncate hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   {user.name}
-                </p>
+                </Link>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   {user.totalScore.toLocaleString()} điểm
                 </p>
@@ -146,9 +148,14 @@ export default function CommunitySidebar({ onTopicClick }: CommunitySidebarProps
               className="w-full text-left p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
             >
               <div className="flex items-start justify-between mb-2">
-                <h4 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2">
-                  {post.content}
-                </h4>
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-1">
+                    {post.title}
+                  </h4>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 break-all mt-1 overflow-hidden display-block">
+                    {post.content}
+                  </p>
+                </div>
                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(post.category)}`}>
                   {post.category.toUpperCase()}
                 </span>

@@ -5,6 +5,7 @@ import { Heart, MessageCircle, Share2 } from 'lucide-react';
 import TimeAgo from 'react-timeago';
 import viStrings from 'react-timeago/lib/language-strings/vi';
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';
+import Link from 'next/link';
 
 
 const formatter = buildFormatter(viStrings);
@@ -50,13 +51,15 @@ export default function PostCard({ post, onLike, onCommentClick, onDelete }: Pos
         <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
           {post.author && post.author.avatar 
             ? <img src={post.author.avatar} alt={post.author.name} className="w-10 h-10 rounded-full object-cover" /> 
-            : post.author?.name.charAt(0).toUpperCase()
+            : (post.author?.name ? post.author.name.charAt(0).toUpperCase() : '?')
           }
         </div>
         <div className="flex-1">
           {/* --- PHẦN JSX ĐÃ ĐƯỢC HOÀN THIỆN --- */}
           <div className="flex items-center space-x-2 mb-1">
-            <h3 className="font-medium text-gray-900 dark:text-white">{post.author?.name}</h3>
+            <Link href={`/user/${post.author?._id}`} className="font-medium text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+              {post.author?.name || 'Ẩn danh'}
+            </Link>
             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(post.category)}`}>
               {getCategoryLabel(post.category)}
             </span>
@@ -67,7 +70,10 @@ export default function PostCard({ post, onLike, onCommentClick, onDelete }: Pos
         </div>
       </div>
 
-      <p className="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap break-words">{post.content}</p>
+      <h3 className="font-semibold text-lg text-gray-900 dark:text-white mb-2">{post.title}</h3>
+      <p className="mb-4 text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap break-words">
+        {post.content.length > 300 ? `${post.content.substring(0, 300)}...` : post.content}
+      </p>
       
       <div className="flex items-center space-x-6">
         <button onClick={() => onLike(post._id)} className={`flex items-center space-x-2 text-sm transition-colors ${isLiked ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400'}`}>

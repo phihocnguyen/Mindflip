@@ -76,6 +76,7 @@ export class CommunityService {
     const topPostsPromise = this.postModel.aggregate([
       {
         $project: {
+          title: 1,
           content: 1,
           category: 1,
           author: 1,

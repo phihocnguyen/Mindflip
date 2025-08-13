@@ -3,6 +3,11 @@ import { PostCategory } from '../schemas/post.schema';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePostDto {
+  @ApiProperty({ example: 'Kinh nghiệm đạt 900+ TOEIC' })
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
   @ApiProperty({ example: 'Chia sẻ kinh nghiệm học TOEIC...' })
   @IsString()
   @IsNotEmpty()

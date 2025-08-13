@@ -28,10 +28,20 @@ export default function ReplyForm({ onSubmit, onCancel }: ReplyFormProps) {
   return (
     <form onSubmit={handleSubmit} className="ml-11 mt-2">
       <div className="flex items-end space-x-3">
-        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-          <span className="text-white text-xs font-medium">
-            {user?.name.charAt(0).toUpperCase() || 'U'}
-          </span>
+        <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+          {user?.avatar ? (
+            <img 
+              src={user.avatar} 
+              alt={user.name} 
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-medium">
+                {user?.name?.charAt(0).toUpperCase() || 'U'}
+              </span>
+            </div>
+          )}
         </div>
         <div className="flex-1 flex space-x-2">
           <div className="relative flex-1">

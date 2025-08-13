@@ -90,6 +90,16 @@ export default function CommentModal({ postId, onClose, onCommentPosted, onPostU
       const createdComment = res.data.data;
       setComments(prev => [createdComment, ...prev]);
       setNewComment('');
+      
+      // Cập nhật số lượng comment trong state post
+      setPost(prevPost => {
+        if (!prevPost) return prevPost;
+        return {
+          ...prevPost,
+          commentCount: prevPost.commentCount + 1
+        };
+      });
+      
       onCommentPosted(postId, post.commentCount + 1);
 
     } catch (error) {
@@ -153,6 +163,17 @@ export default function CommentModal({ postId, onClose, onCommentPosted, onPostU
       setComments(prev => prev.map(c => 
         c._id === parentCommentId ? { ...c, replyCount: c.replyCount + 1 } : c
       ));
+      
+      // Cập nhật số lượng comment trong state post
+      setPost(prevPost => {
+        if (!prevPost) return prevPost;
+        return {
+          ...prevPost,
+          commentCount: prevPost.commentCount + 1
+        };
+      });
+      
+      onCommentPosted(postId, post.commentCount + 1);
     }
   };
 
@@ -187,7 +208,7 @@ export default function CommentModal({ postId, onClose, onCommentPosted, onPostU
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-xl w-full max-h-[80vh] flex flex-col m-4 relative">
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {loadingPost ? 'Đang tải...' : `Bài viết của ${post?.author.name}`}
+                {loadingPost ? 'Đang tải...' : `Bài viết của ${post?.author?.name || 'Ẩn danh'}`}
           </h2>
           <button onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors">
             <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
@@ -201,14 +222,27 @@ export default function CommentModal({ postId, onClose, onCommentPosted, onPostU
             {post && (
               <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
                 <div className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-sm font-medium">{post.author.name.charAt(0).toUpperCase()}</span>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+                    {post?.author?.avatar ? (
+                      <img 
+                        src={post.author.avatar} 
+                        alt={post.author.name} 
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm font-medium">
+                          {post?.author?.name?.charAt(0).toUpperCase() || '?'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <p className="font-semibold text-sm text-gray-900 dark:text-white">{post.author.name}</p>
+                    <p className="font-semibold text-sm text-gray-900 dark:text-white">{post?.author?.name || 'Ẩn danh'}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       <TimeAgo date={post.createdAt} formatter={formatter} />
                     </p>
+                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white my-2">{post.title}</h3>
                     <p className="my-4 text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap break-words break-all">{post.content}</p>
 
                     <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
@@ -274,8 +308,20 @@ export default function CommentModal({ postId, onClose, onCommentPosted, onPostU
             <div className="p-4 border-t border-gray-200 dark:border-gray-700">
               <form onSubmit={handleSubmitComment}>
                 <div className="flex items-end space-x-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-xs font-medium">{user?.name.charAt(0).toUpperCase() || 'U'}</span>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">
+                    {user?.avatar ? (
+                      <img 
+                        src={user.avatar} 
+                        alt={user.name} 
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-medium">
+                          {user?.name?.charAt(0).toUpperCase() || 'U'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 flex space-x-2">
                     <div className="relative flex-1">
