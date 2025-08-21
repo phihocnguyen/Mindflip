@@ -5,6 +5,8 @@ import Navigation from "../components/Navigation";
 import PageTransition from "../components/PageTransition";
 import AuthProvider from "../components/AuthProvider";
 import LoginModal from "~/components/LoginModal";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -34,6 +36,18 @@ export default function RootLayout({
             {children}
           </PageTransition>
           <LoginModal />
+          <ToastContainer 
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+          />
         </AuthProvider>
       </body>
     </html>

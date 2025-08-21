@@ -8,7 +8,8 @@ import SetSelector from '../../writing/components/SetSelector';
 import ListeningQuestion from './ListeningQuestion';
 import ProgressBar from '../../writing/components/ProgressBar';
 import ResultModal from '../../writing/components/ResultModal';
-import { apiHelper } from '~/libs';
+import { apiHelper } from '../../../../libs/api';
+import { toast } from 'react-toastify';
 import { useAuthStore } from '~/hooks/useAuth';
 
 // --- INTERFACES ---
@@ -117,7 +118,7 @@ export default function ListeningGameClient() {
       const response = await apiHelper.get<VocabularyTerm[]>(`/api/sets/${setId}/random-terms?limit=${limit}`);
       if (response.success && response.data) {
         if (response.data.length < 1) {
-          alert('Bộ từ vựng này không có từ nào để tạo bài tập.');
+          toast.error('Bộ từ vựng này không có từ nào để tạo bài tập.');
           setCurrentVocabulary([]);
           setQuestions([]);
         } else {

@@ -61,14 +61,24 @@ export default function CommunityHeader({ onPostCreated }: CommunityHeaderProps)
         content: postContent,
         category: postCategory,
       });
-      let newPost = {}
+      
       if (res.status === 201) {
-        newPost = res.data.data;
+        // Đảm bảo thông tin author đầy đủ được truyền về
+        const postData = res.data.data;
+        const newPost: Post = {
+          ...postData,
+          author: postData.author || (user ? { 
+            _id: user.id, 
+            name: user.name, 
+            avatar: user.avatar 
+          } : null)
+        };
+        
         setPostTitle('');
         setPostContent('');
         setPostCategory(CATEGORIES[0]);
         setShowCreatePost(false);
-        onPostCreated(newPost as Post); 
+        onPostCreated(newPost); 
       }
 
     } catch (error) {

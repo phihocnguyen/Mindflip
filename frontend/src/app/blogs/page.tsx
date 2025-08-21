@@ -261,7 +261,7 @@ export default function BlogListPage() {
               </h2>
               
               <Link href={`/blogs/${mockBlogPosts[0].id}`} className="block group">
-                <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30 overflow-hidden hover:shadow-2xl transition-all duration-300 group-hover:scale-[1.02]">
+                <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30 overflow-hidden hover:shadow-2xl transition-all duration-300">
                   <div className="p-8 lg:p-10">
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
                       <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r ${categoryColors[mockBlogPosts[0].category as keyof typeof categoryColors]} border mb-4 lg:mb-0`}>

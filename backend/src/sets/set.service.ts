@@ -29,6 +29,18 @@ export class SetsService {
     return this.setModel.find({ creatorId: userId }).exec();
   }
 
+  async findAllForUserPaginated(userId: string, page: number = 1, limit: number = 6): Promise<{ sets: StudySet[], total: number, totalPages: number }> {
+    const skip = (page - 1) * limit;
+    const [sets, total] = await Promise.all([
+      this.setModel.find({ creatorId: userId }).skip(skip).limit(limit).exec(),
+      this.setModel.countDocuments({ creatorId: userId }).exec()
+    ]);
+    
+    const totalPages = Math.ceil(total / limit);
+    
+    return { sets, total, totalPages };
+  }
+
   async findOne(id: string, userId: string): Promise<StudySet> {
     const studySet = await this.setModel.findById(id).exec();
     if (!studySet) {

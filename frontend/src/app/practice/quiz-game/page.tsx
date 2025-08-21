@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../../hooks/useAuth';
+import Sidebar from '../../../components/Sidebar';
 import LoadingSpinner from '../../../components/LoadingSpinner';
-import Link from 'next/link';
 import { apiHelper } from '../../../libs/api';
+import Link from 'next/link';
+import { toast } from 'react-toastify';
 import { X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // --- INTERFACES ---
 interface VocabularyTerm {
@@ -112,7 +114,7 @@ export default function QuizGame() {
       const response = await apiHelper.get<VocabularyTerm[]>(`/api/sets/${setId}/random-terms?limit=${limit}`);
       if (response.success && response.data) {
         if (response.data.length < 4) {
-          alert(`Bộ từ vựng này chỉ có ${response.data.length} từ. Cần ít nhất 4 từ để tạo quiz.`);
+          toast.error(`Bộ từ vựng này chỉ có ${response.data.length} từ. Cần ít nhất 4 từ để tạo quiz.`);
           setCurrentVocabulary([]);
         } else {
           setCurrentVocabulary(response.data);

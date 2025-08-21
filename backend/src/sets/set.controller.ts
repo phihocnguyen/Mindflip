@@ -25,8 +25,11 @@ export class SetsController {
 
   @Get()
   @ApiOperation({ summary: 'Lấy danh sách các bộ từ của người dùng' })
-  findAll(@Req() req: Request) {
+  findAll(@Req() req: Request, @Query('page') page?: number, @Query('limit') limit?: number) {
     const userId = req.user!['_id'];
+    if (page !== undefined && limit !== undefined) {
+      return this.setsService.findAllForUserPaginated(userId, page, limit);
+    }
     return this.setsService.findAllForUser(userId);
   }
 

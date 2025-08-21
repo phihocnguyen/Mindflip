@@ -19,9 +19,11 @@ export class PostsService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
-  create(createPostDto: CreatePostDto, authorId: string) {
+  async create(createPostDto: CreatePostDto, authorId: string) {
     const newPost = new this.postModel({ ...createPostDto, author: authorId });
-    return newPost.save();
+    const savedPost = await newPost.save();
+    // Populate author information before returning
+    return savedPost.populate('author', 'name avatar');
   }
 
   async findAll(options: FindAllPostsOptions = {}) {

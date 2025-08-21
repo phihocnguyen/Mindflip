@@ -14,6 +14,15 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Performance optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error"] } : false,
+  },
+  experimental: {
+    optimizeCss: true,
+  },
+  // Enable static optimization for pages that don't need SSR
+  reactStrictMode: true,
 };
 
 export default nextConfig;

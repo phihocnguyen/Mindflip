@@ -326,7 +326,7 @@ export default function StudySet() {
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="w-full max-w-2xl h-80" style={{ perspective: '1000px' }}>
           <div 
-            className={`relative w-full h-full cursor-pointer transition-transform duration-1000 ease-in-out hover:scale-105
+            className={`relative w-full h-full cursor-pointer transition-transform duration-700 ease-in-out hover:scale-105 transform-transition
               ${animationDirection === 'next' ? 'animate-slide-next' : ''}
               ${animationDirection === 'prev' ? 'animate-slide-prev' : ''}`}
             style={{ transformStyle: 'preserve-3d' }}
@@ -445,11 +445,11 @@ export default function StudySet() {
         }
 
         .animate-slide-next {
-          animation: slideNext 0.5s ease-in-out;
+          animation: slideNext 0.7s ease-in-out forwards;
         }
 
         .animate-slide-prev {
-          animation: slidePrev 0.5s ease-in-out;
+          animation: slidePrev 0.7s ease-in-out forwards;
         }
       `}</style>
     </div>

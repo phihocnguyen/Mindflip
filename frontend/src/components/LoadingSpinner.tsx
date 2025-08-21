@@ -9,28 +9,11 @@ interface LoadingSpinnerProps {
 }
 
 export default function LoadingSpinner({ isLoading, onLoadingComplete }: LoadingSpinnerProps) {
-  const [isVisible, setIsVisible] = useState(true);
-  const [isFading, setIsFading] = useState(false);
-
-  useEffect(() => {
-    if (!isLoading && isVisible) {
-      setIsFading(true);
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-        onLoadingComplete?.();
-      }, 300); // Fade out duration
-
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading, isVisible, onLoadingComplete]);
-
-  if (!isVisible) return null;
+  if (!isLoading) return null;
 
   return (
     <div 
-      className={`fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center transition-opacity duration-300 ${
-        isFading ? 'opacity-0' : 'opacity-100'
-      }`}
+      className={`fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center`}
     >
       {/* Logo */}
       <div className="mb-4">

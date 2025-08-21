@@ -13,12 +13,16 @@ interface VocabularyCollectionClientProps {
   vocabularyWords: VocabularyWord[];
   onRemoveWord: (id: string) => void;
   onCreateSet: () => void;
+  creatingSet?: boolean;
+  error?: string | null;
 }
 
 export default function VocabularyCollectionClient({ 
   vocabularyWords, 
   onRemoveWord, 
-  onCreateSet 
+  onCreateSet,
+  creatingSet = false,
+  error = null
 }: VocabularyCollectionClientProps) {
   const [isOpen, setIsOpen] = useState(true);
 
@@ -47,6 +51,18 @@ export default function VocabularyCollectionClient({
             </svg>
           </button>
         </div>
+        
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 dark:border-red-500 p-4">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-red-400 dark:text-red-300 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+            </div>
+          </div>
+        )}
         
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 bg-white dark:bg-gray-800">
@@ -99,14 +115,24 @@ export default function VocabularyCollectionClient({
         <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <button
             onClick={onCreateSet}
-            disabled={vocabularyWords.length === 0}
-            className={`w-full py-2 px-4 rounded-lg font-medium transition-colors duration-200 ${
-              vocabularyWords.length === 0
+            disabled={vocabularyWords.length === 0 || creatingSet}
+            className={`w-full py-2 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center ${
+              vocabularyWords.length === 0 || creatingSet
                 ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
           >
-            Tạo bộ từ vựng ({vocabularyWords.length})
+            {creatingSet ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Đang tạo...
+              </>
+            ) : (
+              `Tạo bộ từ vựng (${vocabularyWords.length})`
+            )}
           </button>
         </div>
       </div>

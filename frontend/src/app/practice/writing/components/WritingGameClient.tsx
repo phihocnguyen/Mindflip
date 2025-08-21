@@ -10,6 +10,7 @@ import ProgressBar from './ProgressBar';
 import ResultModal from './ResultModal';
 import { apiHelper } from '~/libs';
 import { useAuthStore } from '~/hooks/useAuth';
+import { toast } from 'react-toastify';
 
 // --- INTERFACES ---
 interface VocabularyTerm {
@@ -114,7 +115,7 @@ export default function WritingGameClient() {
       const response = await apiHelper.get<VocabularyTerm[]>(`/api/sets/${setId}/random-terms?limit=${limit}`);
       if (response.success && response.data) {
         if (response.data.length < 1) {
-          alert('Bộ từ vựng này không có từ nào để tạo bài tập.');
+          toast.error('Bộ từ vựng này không có từ nào để tạo bài tập.');
           setCurrentVocabulary([]);
           setQuestions([]);
         } else {

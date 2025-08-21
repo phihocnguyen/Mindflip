@@ -56,8 +56,7 @@ Knowing these words will help you navigate airports, hotels, and local transport
 
 Happy travels!`,
     author: {
-      name: 'Nguyen Thuy Linh',
-      bio: 'English teacher with 10 years of experience helping students master travel vocabulary.'
+      name: 'Nguyễn Phi Học'
     },
     createdAt: '2023-06-15',
     readTime: 5,
@@ -99,8 +98,7 @@ Happy travels!`,
 
 Practice these phrases in mock meetings to build fluency and confidence.`,
     author: {
-      name: 'Tran Minh Duc',
-      bio: 'Business English specialist with experience in multinational corporations.'
+      name: 'Nguyễn Phi Học'
     },
     createdAt: '2023-06-10',
     readTime: 8,
@@ -147,8 +145,7 @@ Practice these phrases in mock meetings to build fluency and confidence.`,
 
 Understanding idioms takes time, but they're essential for sounding like a native speaker.`,
     author: {
-      name: 'Pham Quoc Khanh',
-      bio: 'Linguistics expert focusing on colloquial expressions and cultural language nuances.'
+      name: 'Nguyễn Phi Học'
     },
     createdAt: '2023-06-05',
     readTime: 10,
@@ -189,8 +186,7 @@ Always cite sources properly using APA, MLA, or Chicago style depending on your 
 
 Practice writing paragraphs using these structures to develop your academic writing skills.`,
     author: {
-      name: 'Le Thi Hoa',
-      bio: 'Academic writing coach with experience helping students at universities worldwide.'
+      name: 'Nguyễn Phi Học'
     },
     createdAt: '2023-05-28',
     readTime: 12,
@@ -338,17 +334,21 @@ export default function BlogPostPage({ params }: { params: Promise<{ id: string 
                   {/* Author Info */}
                   <div className="flex items-center mb-6 lg:mb-8">
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 rounded-full border-2 border-white dark:border-gray-800 shadow-sm" />
+                      <div className="bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/50 dark:to-indigo-900/50 rounded-xl w-10 h-10 flex items-center justify-center mr-3">
+                        <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        </svg>
+                      </div>
                     </div>
-                    <div className="ml-4">
-                      <p className="text-base font-semibold text-gray-900 dark:text-gray-100">
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         {post.author.name}
                       </p>
-                      {post.author.bio && (
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5 leading-relaxed">
-                          {post.author.bio}
-                        </p>
-                      )}
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                        <span>{new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
+                        <span className="mx-2">•</span>
+                        <span>{post.readTime} phút đọc</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -470,7 +470,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ id: string 
             <div className="hidden xl:block xl:col-span-1">
               <div className="sticky top-24">
                 <div className="">
-                  <BlogVocabularyManager />
+                  <BlogVocabularyManager blogTitle={post.title} />
                 </div>
               </div>
             </div>
@@ -509,7 +509,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ id: string 
                     </div>
                   </div>
                   <div className="mt-6 relative flex-1 px-4 sm:px-6">
-                    <BlogVocabularyManager />
+                    <BlogVocabularyManager blogTitle={post.title} />
                   </div>
                 </div>
               </div>

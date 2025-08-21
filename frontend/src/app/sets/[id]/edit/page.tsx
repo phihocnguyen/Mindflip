@@ -10,13 +10,14 @@ import { Plus, X, ArrowLeft, Save, Eye, Trash2, BookOpen, Sparkles } from 'lucid
 interface Card {
   term: string;
   definition: string;
+  isLearned?: boolean;
 }
 
 interface Set {
   _id: string;
   title: string;
   description: string;
-  cards: Card[];
+  terms: Card[];
   isPublic: boolean;
   createdAt: string;
   updatedAt: string;
@@ -57,7 +58,17 @@ export default function EditSet() {
         setSet(data);
         setTitle(data.title);
         setDescription(data.description || '');
-        setCards(data.cards.length > 0 ? data.cards : [{ term: '', definition: '' }, { term: '', definition: '' }]);
+        
+        // Convert terms from backend to cards format for UI
+        const initialCards = data.terms && data.terms.length > 0 
+          ? data.terms.map(term => ({ 
+              term: term.term, 
+              definition: term.definition,
+              isLearned: term.isLearned || false
+            }))
+          : [{ term: '', definition: '' }, { term: '', definition: '' }];
+          
+        setCards(initialCards);
         setIsPublic(data.isPublic);
       } else {
         throw new Error(response.error || 'Failed to fetch set');
@@ -130,10 +141,18 @@ export default function EditSet() {
     setError(null);
   
     try {
-      const response = await apiHelper.put(`/api/sets/${setId}`, {
+      // Convert cards to terms format expected by backend
+      const terms = cards
+        .filter(card => card.term.trim() && card.definition.trim())
+        .map(card => ({
+          term: card.term.trim(),
+          definition: card.definition.trim()
+        }));
+      
+      const response = await apiHelper.patch(`/api/sets/${setId}`, {
         title: title.trim(),
         description: description.trim(),
-        cards: cards.filter(card => card.term.trim() && card.definition.trim()),
+        terms,
         isPublic,
       });
 
@@ -160,8 +179,8 @@ export default function EditSet() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400/20 to-purple-400/20 dark:from-blue-600/10 dark:to-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 dark:from-purple-600/10 dark:to-pink-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400/20 to-purple-400/20 dark:from-blue-600/10 dark:to-purple-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '3s' }}></div>
+          <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 dark:from-purple-600/10 dark:to-pink-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '3s', animationDelay: '1s' }}></div>
         </div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-center min-h-[400px]">
@@ -176,8 +195,8 @@ export default function EditSet() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400/20 to-purple-400/20 dark:from-blue-600/10 dark:to-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 dark:from-purple-600/10 dark:to-pink-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400/20 to-purple-400/20 dark:from-blue-600/10 dark:to-purple-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '3s' }}></div>
+          <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 dark:from-purple-600/10 dark:to-pink-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '3s', animationDelay: '1s' }}></div>
         </div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
@@ -201,8 +220,8 @@ export default function EditSet() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400/20 to-purple-400/20 dark:from-blue-600/10 dark:to-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 dark:from-purple-600/10 dark:to-pink-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-r from-blue-400/20 to-purple-400/20 dark:from-blue-600/10 dark:to-purple-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '3s' }}></div>
+        <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 dark:from-purple-600/10 dark:to-pink-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '3s', animationDelay: '1s' }}></div>
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

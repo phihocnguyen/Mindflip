@@ -15,7 +15,6 @@ export class AnalyticsService {
     @InjectModel(StudySet.name) private setModel: Model<StudySetDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {
-    // Đặt múi giờ mặc định cho toàn bộ service
     moment.tz.setDefault('Asia/Ho_Chi_Minh');
   }
 
