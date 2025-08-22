@@ -10,7 +10,7 @@ const useAuthStore = create((set) => ({
 
 const VideoPlayer = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const YOUTUBE_VIDEO_ID = '_w0Ikk4JY7U';
+  const YOUTUBE_VIDEO_ID = 'SwuFlbv1QI4';
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -33,13 +33,13 @@ const VideoPlayer = () => {
         <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 sm:p-8 shadow-2xl">
           <div
             onClick={openModal}
-            className="relative aspect-video rounded-2xl overflow-hidden group cursor-pointer"
+            className="relative flex items-center justify-center aspect-video rounded-2xl overflow-hidden group cursor-pointer"
           >
             {/* YouTube Thumbnail Image */}
             <img
-              src={`https://img.youtube.com/vi/${YOUTUBE_VIDEO_ID}/maxresdefault.jpg`}
+              src="/my-logo.png"
               alt="Video Thumbnail"
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-[300px] h-[200px] transition-transform duration-300 group-hover:scale-105"
             />
             
             {/* Overlay and Play Button */}
